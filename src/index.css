@@ -1,44 +1,90 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0a0a0f;
-  --color-bg-card: #12121a;
-  --color-bg-elevated: #1a1a2e;
-  --color-text-primary: #e8e8ed;
-  --color-text-secondary: #8888a0;
-  --color-accent: #6366f1;
-  --color-accent-hover: #818cf8;
-  --color-border: #1e1e30;
-
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-serif: 'Bodoni Moda', 'Georgia', serif;
+  --font-display: 'Inter', system-ui, sans-serif;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
+* {
   margin: 0;
-  background-color: var(--color-bg);
-  color: var(--color-text-primary);
-  font-family: var(--font-sans);
+  padding: 0;
+  box-sizing: border-box;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0a0604;
+  letter-spacing: -0.03em;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--color-bg);
+/* Hide default cursor on desktop */
+@media (min-width: 768px) {
+  html, body, a, button {
+    cursor: none;
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 3px;
+/* Custom cursor */
+.custom-cursor {
+  position: fixed;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  mix-blend-mode: difference;
+  z-index: 9999;
+  transition: width 0.2s, height 0.2s;
+  will-change: transform;
 }
 
+/* Noise overlay */
+.noise-overlay {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: transparent url("https://assets.iceable.com/img/noise-transparent.png") repeat 0 0;
+  background-size: 300px 300px;
+  animation: noise-animation 0.3s steps(5) infinite;
+  opacity: 0.6;
+  will-change: transform;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@keyframes noise-animation {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-2%, -3%); }
+  20% { transform: translate(-4%, 2%); }
+  30% { transform: translate(2%, -4%); }
+  40% { transform: translate(-2%, 5%); }
+  50% { transform: translate(-4%, 2%); }
+  60% { transform: translate(3%, 0); }
+  70% { transform: translate(0, 3%); }
+  80% { transform: translate(-3%, 0); }
+  90% { transform: translate(2%, 2%); }
+  100% { transform: translate(1%, 0); }
+}
+
+/* Canvas positioning */
+canvas {
+  display: block;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+/* Selection */
 ::selection {
-  background-color: var(--color-accent);
-  color: white;
+  background-color: #ffcc00;
+  color: #0a0604;
 }
