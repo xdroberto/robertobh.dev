@@ -4,13 +4,13 @@ import WaveShader from './components/three/WaveShader'
 
 export default function App() {
   return (
-    <div className="relative h-dvh w-dvw overflow-hidden bg-[#0a0604]">
+    <div className="relative h-full w-full overflow-hidden bg-[#0a0604]">
       {/* Shader background */}
       <Canvas
         camera={{ position: [0, 0, 1] }}
-        gl={{ antialias: true }}
+        gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
         dpr={[1, 2]}
-        className="!fixed !inset-0 !w-dvw !h-dvh"
+        style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }}
       >
         <WaveShader />
       </Canvas>

@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react'
+import { useRef, useMemo, useEffect, useCallback } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -6,7 +6,7 @@ const vertexShader = `
 varying vec2 vUv;
 void main() {
   vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  gl_Position = vec4(position.xy, 0.0, 1.0);
 }
 `
 
@@ -36,10 +36,6 @@ uniform float lineThickness;
 uniform float grainIntensity;
 
 varying vec2 vUv;
-
-float squared(float value) {
-  return value * value;
-}
 
 float smootherstep(float edge0, float edge1, float x) {
   float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
@@ -193,22 +189,13 @@ export default function WaveShader() {
   const { gl } = useThree()
   const mouse = useRef({ x: 0.5, y: 0.5 })
 
-  // Ensure canvas fills viewport
-  useEffect(() => {
-    gl.setSize(window.innerWidth, window.innerHeight)
-    const onResize = () => gl.setSize(window.innerWidth, window.innerHeight)
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [gl])
-
   const uniforms = useMemo(
     () => ({
-      iResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+      iResolution: { value: new THREE.Vector2(1, 1) },
       iTime: { value: 0 },
       iMouse: { value: new THREE.Vector2(0.5, 0.5) },
       lineThickness: { value: 1.8 },
       grainIntensity: { value: 0.075 },
-      // Warm palette (James Webb / RAM vibe)
       bgColorDown: { value: c(30, 12, 8) },
       bgColorUp: { value: c(12, 8, 4) },
       color1In: { value: c(255, 200, 0) },
@@ -217,10 +204,9 @@ export default function WaveShader() {
       color2Out: { value: c(200, 50, 50) },
       color3In: { value: c(255, 150, 50) },
       color3Out: { value: c(200, 100, 0) },
-      color4In: { value: c(80, 160, 255) },   // Electric blue
-      color4Out: { value: c(30, 80, 200) },    // Deep blue
+      color4In: { value: c(80, 160, 255) },
+      color4Out: { value: c(30, 80, 200) },
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   )
 
@@ -228,21 +214,52 @@ export default function WaveShader() {
     const material = meshRef.current?.material as THREE.ShaderMaterial
     if (!material) return
     material.uniforms.iTime.value = state.clock.elapsedTime
-    material.uniforms.iResolution.value.set(window.innerWidth, window.innerHeight)
+    material.uniforms.iResolution.value.set(state.size.width, state.size.height)
     material.uniforms.iMouse.value.set(mouse.current.x, mouse.current.y)
   })
 
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      mouse.current.x = e.clientX / window.innerWidth
-      mouse.current.y = e.clientY / window.innerHeight
-    }
-    window.addEventListener('mousemove', onMove)
-    return () => window.removeEventListener('mousemove', onMove)
+  // Mouse tracking (desktop)
+  const onMove = useCallback((e: MouseEvent) => {
+    mouse.current.x = e.clientX / window.innerWidth
+    mouse.current.y = e.clientY / window.innerHeight
   }, [])
 
+  // Touch tracking (mobile)
+  const onTouch = useCallback((e: TouchEvent) => {
+    if (e.touches.length > 0) {
+      mouse.current.x = e.touches[0].clientX / window.innerWidth
+      mouse.current.y = e.touches[0].clientY / window.innerHeight
+    }
+  }, [])
+
+  useEffect(() => {
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('touchmove', onTouch, { passive: true })
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('touchmove', onTouch)
+    }
+  }, [onMove, onTouch])
+
+  // Handle WebGL context loss gracefully
+  useEffect(() => {
+    const canvas = gl.domElement
+    const onLost = (e: Event) => {
+      e.preventDefault()
+    }
+    const onRestored = () => {
+      gl.compile(meshRef.current!.parent!, meshRef.current!.parent!.children[0] as THREE.Camera)
+    }
+    canvas.addEventListener('webglcontextlost', onLost)
+    canvas.addEventListener('webglcontextrestored', onRestored)
+    return () => {
+      canvas.removeEventListener('webglcontextlost', onLost)
+      canvas.removeEventListener('webglcontextrestored', onRestored)
+    }
+  }, [gl])
+
   return (
-    <mesh ref={meshRef}>
+    <mesh ref={meshRef} frustumCulled={false}>
       <planeGeometry args={[2, 2]} />
       <shaderMaterial
         vertexShader={vertexShader}
