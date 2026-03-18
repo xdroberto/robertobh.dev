@@ -73,12 +73,25 @@ html, body {
   100% { transform: translate(1%, 0); }
 }
 
-/* Canvas positioning */
+/* Canvas positioning - force fullscreen */
+#root,
+#root > div {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
 canvas {
-  display: block;
+  display: block !important;
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+/* R3F container override */
+div[data-reactroot] canvas,
+.fixed canvas {
   width: 100vw !important;
   height: 100vh !important;
 }

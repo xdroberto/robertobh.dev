@@ -23,16 +23,22 @@ export default function App() {
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-[#0a0604]">
-      {/* Shader background */}
-      <div className="absolute inset-0 z-0">
-        <Canvas
-          camera={{ position: [0, 0, 1] }}
-          gl={{ antialias: true }}
-          dpr={[1, 2]}
-        >
-          <WaveShader />
-        </Canvas>
-      </div>
+      {/* Shader background - force fullscreen */}
+      <Canvas
+        camera={{ position: [0, 0, 1] }}
+        gl={{ antialias: true }}
+        dpr={[1, 2]}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 0,
+        }}
+      >
+        <WaveShader />
+      </Canvas>
 
       {/* Noise overlay */}
       <div className="noise-overlay" />
@@ -43,7 +49,8 @@ export default function App() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.7 }}
           transition={{ duration: 1.5, delay: 0.5 }}
-          className="font-serif italic text-[clamp(0.7rem,1.2vw,1rem)] text-[#e0e0e0]/60 mb-6 tracking-wide"
+          className="font-serif italic text-[clamp(0.7rem,1.2vw,1rem)] text-[#e0e0e0]/70 mb-6 tracking-wide"
+          style={{ textShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.6)' }}
         >
           Creative Developer &amp; Digital Craftsman
         </motion.p>
@@ -52,7 +59,8 @@ export default function App() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.8 }}
-          className="font-display text-[clamp(2.5rem,8vw,7rem)] leading-[1.1] font-bold tracking-tight text-[#e0e0e0] uppercase mb-4"
+          className="font-display text-[clamp(2.5rem,8vw,7rem)] leading-[1.1] font-bold tracking-tight text-white uppercase mb-4"
+          style={{ textShadow: '0 0 40px rgba(0,0,0,0.9), 0 0 80px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.8)' }}
         >
           Roberto BH
         </motion.h1>
@@ -61,7 +69,8 @@ export default function App() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.2 }}
-          className="font-serif italic text-[clamp(0.8rem,1.5vw,1.1rem)] text-[#e0e0e0]/50 mb-10 tracking-widest"
+          className="font-serif italic text-[clamp(0.8rem,1.5vw,1.1rem)] text-[#e0e0e0]/60 mb-10 tracking-widest"
+          style={{ textShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.6)' }}
         >
           Portfolio coming soon
         </motion.p>

@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -29,7 +29,6 @@ uniform vec3 color3Out;
 
 // Settings
 uniform float lineThickness;
-uniform float idleWaveHeight;
 
 // Grain
 uniform float grainIntensity;
@@ -66,60 +65,88 @@ void main() {
   // Background gradient
   vec3 bgCol = mix(bgColorDown, bgColorUp, clamp(p.y * 2.0, 0.0, 1.0));
 
-  float speed = 0.1;
+  // Subtle mouse influence
+  float mouseInfluence = (iMouse.y - 0.5) * 0.03;
 
-  // Subtle mouse influence on wave center
-  float mouseInfluence = (iMouse.y - 0.5) * 0.02;
+  // Simulated audio-like energy using sine combinations (organic movement)
+  float energy1 = 0.5 + 0.5 * sin(iTime * 0.37) * sin(iTime * 0.53 + 1.2);
+  float energy2 = 0.5 + 0.5 * sin(iTime * 0.29 + 2.0) * sin(iTime * 0.67);
+  float energy3 = 0.5 + 0.5 * sin(iTime * 0.43 + 4.0) * sin(iTime * 0.31 + 0.7);
 
-  // Idle wave animations - 3 overlapping sine waves
-  float idleWave1 = idleWaveHeight * sin(p.x * 5.0 + iTime * 0.2);
-  float idleWave2 = idleWaveHeight * 0.8 * sin(p.x * 5.0 + iTime * 0.2 + 0.3);
-  float idleWave3 = idleWaveHeight * 1.2 * sin(p.x * 5.0 + iTime * 0.2 - 0.2);
+  // Simulated kick/pulse
+  float pulse = pow(0.5 + 0.5 * sin(iTime * 1.2), 8.0) * 0.3;
 
-  // Base curve
-  float curve = idleWaveHeight * sin(6.25 * p.x + speed * iTime);
+  // === LINE A - Gold/Orange (bass-like, slow, wide) ===
+  float lineAWave = 0.02 + 0.03 * energy1 + pulse * 0.04;
+  float lineAFreq = 8.0 + 30.0 * energy1;
+  float lineASpeed = 0.4 + 1.5 * energy1;
+  float lineAOffset = energy1 * 0.03 * sin(p.x * 10.0 - iTime * 1.5);
 
-  // Line A - warm gold
-  float lineAFreq = 40.0;
-  float lineASpeed = 1.5 * speed;
-  float lineAAnim = 0.5 + mouseInfluence + curve + idleWave1 * sin(lineAFreq * p.x + (-lineASpeed * iTime));
-  float lineADist = distance(p.y, lineAAnim) * (2.0 / lineThickness);
+  float lineAAnim = 0.5 + mouseInfluence
+    + lineAWave * sin(lineAFreq * p.x - lineASpeed * iTime)
+    + 0.02 * sin(p.x * 3.0 + iTime * 0.15)
+    + lineAOffset;
+
+  float lineAThick = lineThickness * (1.0 + energy1 * 0.5 + pulse * 1.0);
+  float lineADist = distance(p.y, lineAAnim) * (2.0 / lineAThick);
   float lineAShape = smootherstep(1.0 - clamp(lineADist, 0.0, 1.0), 1.0, 0.99);
   vec3 lineACol = (1.0 - lineAShape) * mix(color1In, color1Out, lineAShape);
 
   // Ball A
-  float ballAX = 0.2 + 0.05 * sin(iTime * 0.2 * speed);
+  float ballAX = 0.2 + 0.15 * sin(iTime * 0.08);
   float ballADist = distance(p, vec2(ballAX, lineAAnim));
-  float ballAShape = smootherstep(1.0 - clamp(ballADist * 0.5, 0.0, 1.0), 1.0, 0.99);
-  vec3 ballACol = (1.0 - ballAShape) * mix(color1In, color1Out, ballAShape) * 0.8;
+  float ballASize = 0.4 + 0.3 * energy1;
+  float ballAShape = smootherstep(1.0 - clamp(ballADist * ballASize, 0.0, 1.0), 1.0, 0.99);
+  vec3 ballACol = (1.0 - ballAShape) * mix(color1In, color1Out, ballAShape) * 0.6;
 
-  // Line B - red/pink
-  float lineBFreq = 50.0;
-  float lineBSpeed = 2.0 * speed;
-  float lineBAnim = 0.5 + mouseInfluence + curve + idleWave2 * sin(lineBFreq * p.x + lineBSpeed * iTime) * sin(lineBSpeed * iTime);
-  float lineBDist = distance(p.y, lineBAnim) * (2.0 / lineThickness);
+  // === LINE B - Red/Pink (mid-like, medium speed) ===
+  float lineBWave = 0.015 + 0.025 * energy2;
+  float lineBFreq = 12.0 + 40.0 * energy2;
+  float lineBSpeed = 0.6 + 2.0 * energy2;
+  float lineBOffset = energy2 * 0.025 * sin(p.x * 15.0 - iTime * 1.2);
+
+  float lineBAnim = 0.5 + mouseInfluence
+    + lineBWave * sin(lineBFreq * p.x + lineBSpeed * iTime) * sin(lineBSpeed * iTime * 0.5)
+    + 0.015 * sin(p.x * 4.0 + iTime * 0.2 + 1.0)
+    + lineBOffset;
+
+  float lineBThick = lineThickness * (1.0 + energy2 * 0.4);
+  float lineBDist = distance(p.y, lineBAnim) * (2.0 / lineBThick);
   float lineBShape = smootherstep(1.0 - clamp(lineBDist, 0.0, 1.0), 1.0, 0.99);
   vec3 lineBCol = (1.0 - lineBShape) * mix(color2In, color2Out, lineBShape);
 
   // Ball B
-  float ballBX = 0.8 - 0.05 * sin(iTime * 0.3 * speed);
+  float ballBX = 0.8 - 0.12 * sin(iTime * 0.1 + 2.0);
   float ballBDist = distance(p, vec2(ballBX, lineBAnim));
-  float ballBShape = smootherstep(1.0 - clamp(ballBDist * 0.5, 0.0, 1.0), 1.0, 0.99);
-  vec3 ballBCol = (1.0 - ballBShape) * mix(color2In, color2Out, ballBShape) * 0.8;
+  float ballBSize = 0.4 + 0.3 * energy2;
+  float ballBShape = smootherstep(1.0 - clamp(ballBDist * ballBSize, 0.0, 1.0), 1.0, 0.99);
+  vec3 ballBCol = (1.0 - ballBShape) * mix(color2In, color2Out, ballBShape) * 0.6;
 
-  // Line C - orange
-  float lineCFreq = 60.0;
-  float lineCSpeed = 2.5 * speed;
-  float lineCAnim = 0.5 + mouseInfluence + curve * 0.7 + idleWave3 * sin(lineCFreq * p.x + lineCSpeed * iTime) * sin(lineCSpeed * (iTime + 0.1));
-  float lineCDist = distance(p.y, lineCAnim) * (2.0 / lineThickness);
+  // === LINE C - Orange (high-like, fast, complex) ===
+  float lineCWave = 0.012 + 0.02 * energy3;
+  float lineCFreq = 15.0 + 50.0 * energy3;
+  float lineCSpeed = 0.8 + 2.5 * energy3;
+  float lineCOffset = energy3 * 0.02 * sin(p.x * 20.0 - iTime * 0.8);
+
+  float lineCAnim = 0.5 + mouseInfluence
+    + lineCWave * sin(lineCFreq * p.x + lineCSpeed * iTime) * sin(lineCSpeed * (iTime + 0.3))
+    + 0.018 * sin(p.x * 5.0 + iTime * 0.25 - 0.5)
+    + lineCOffset;
+
+  float lineCThick = lineThickness * (1.0 + energy3 * 0.3);
+  float lineCDist = distance(p.y, lineCAnim) * (2.0 / lineCThick);
   float lineCShape = smootherstep(1.0 - clamp(lineCDist, 0.0, 1.0), 1.0, 0.99);
   vec3 lineCCol = (1.0 - lineCShape) * mix(color3In, color3Out, lineCShape);
 
   // Ball C
-  float ballCX = 0.5 + 0.05 * sin(iTime * 0.4 * speed);
+  float ballCX = 0.5 + 0.1 * sin(iTime * 0.12 + 4.0);
   float ballCDist = distance(p, vec2(ballCX, lineCAnim));
-  float ballCShape = smootherstep(1.0 - clamp(ballCDist * 0.5, 0.0, 1.0), 1.0, 0.99);
-  vec3 ballCCol = (1.0 - ballCShape) * mix(color3In, color3Out, ballCShape) * 0.8;
+  float ballCSize = 0.4 + 0.3 * energy3;
+  float ballCShape = smootherstep(1.0 - clamp(ballCDist * ballCSize, 0.0, 1.0), 1.0, 0.99);
+  vec3 ballCCol = (1.0 - ballCShape) * mix(color3In, color3Out, ballCShape) * 0.6;
+
+  // Subtle pulse flash on background
+  bgCol = mix(bgCol, bgCol * 1.3, pulse * 0.5);
 
   // Combine
   vec3 fcolor = bgCol + lineACol + lineBCol + lineCCol + ballACol + ballBCol + ballCCol;
@@ -137,16 +164,23 @@ function c(r: number, g: number, b: number) {
 
 export default function WaveShader() {
   const meshRef = useRef<THREE.Mesh>(null)
-  const { size } = useThree()
+  const { gl } = useThree()
   const mouse = useRef({ x: 0.5, y: 0.5 })
+
+  // Ensure canvas fills viewport
+  useEffect(() => {
+    gl.setSize(window.innerWidth, window.innerHeight)
+    const onResize = () => gl.setSize(window.innerWidth, window.innerHeight)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [gl])
 
   const uniforms = useMemo(
     () => ({
-      iResolution: { value: new THREE.Vector2(size.width, size.height) },
+      iResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
       iTime: { value: 0 },
       iMouse: { value: new THREE.Vector2(0.5, 0.5) },
       lineThickness: { value: 1.8 },
-      idleWaveHeight: { value: 0.012 },
       grainIntensity: { value: 0.075 },
       // Warm palette (James Webb / RAM vibe)
       bgColorDown: { value: c(30, 12, 8) },
@@ -166,17 +200,18 @@ export default function WaveShader() {
     const material = meshRef.current?.material as THREE.ShaderMaterial
     if (!material) return
     material.uniforms.iTime.value = state.clock.elapsedTime
-    material.uniforms.iResolution.value.set(size.width, size.height)
+    material.uniforms.iResolution.value.set(window.innerWidth, window.innerHeight)
     material.uniforms.iMouse.value.set(mouse.current.x, mouse.current.y)
   })
 
-  // Track mouse globally
-  if (typeof window !== 'undefined') {
-    window.onmousemove = (e: MouseEvent) => {
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
       mouse.current.x = e.clientX / window.innerWidth
       mouse.current.y = e.clientY / window.innerHeight
     }
-  }
+    window.addEventListener('mousemove', onMove)
+    return () => window.removeEventListener('mousemove', onMove)
+  }, [])
 
   return (
     <mesh ref={meshRef}>
