@@ -1,41 +1,16 @@
-import { useEffect, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { motion } from 'framer-motion'
 import WaveShader from './components/three/WaveShader'
 
 export default function App() {
-  const cursorRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const cursor = cursorRef.current
-    if (!cursor) return
-    let lastUpdate = 0
-    const onMove = (e: MouseEvent) => {
-      const now = performance.now()
-      if (now - lastUpdate < 16) return
-      lastUpdate = now
-      cursor.style.left = `${e.clientX}px`
-      cursor.style.top = `${e.clientY}px`
-    }
-    window.addEventListener('mousemove', onMove)
-    return () => window.removeEventListener('mousemove', onMove)
-  }, [])
-
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-[#0a0604]">
-      {/* Shader background - force fullscreen */}
+    <div className="relative h-dvh w-dvw overflow-hidden bg-[#0a0604]">
+      {/* Shader background */}
       <Canvas
         camera={{ position: [0, 0, 1] }}
         gl={{ antialias: true }}
         dpr={[1, 2]}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          zIndex: 0,
-        }}
+        className="!fixed !inset-0 !w-dvw !h-dvh"
       >
         <WaveShader />
       </Canvas>
@@ -97,9 +72,6 @@ export default function App() {
           </a>
         </motion.div>
       </div>
-
-      {/* Custom cursor (desktop only) */}
-      <div ref={cursorRef} className="custom-cursor hidden md:block" />
     </div>
   )
 }

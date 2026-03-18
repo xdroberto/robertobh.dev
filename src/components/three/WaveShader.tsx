@@ -26,6 +26,8 @@ uniform vec3 color2In;
 uniform vec3 color2Out;
 uniform vec3 color3In;
 uniform vec3 color3Out;
+uniform vec3 color4In;
+uniform vec3 color4Out;
 
 // Settings
 uniform float lineThickness;
@@ -72,6 +74,7 @@ void main() {
   float energy1 = 0.5 + 0.5 * sin(iTime * 0.37) * sin(iTime * 0.53 + 1.2);
   float energy2 = 0.5 + 0.5 * sin(iTime * 0.29 + 2.0) * sin(iTime * 0.67);
   float energy3 = 0.5 + 0.5 * sin(iTime * 0.43 + 4.0) * sin(iTime * 0.31 + 0.7);
+  float energy4 = 0.5 + 0.5 * sin(iTime * 0.23 + 3.0) * sin(iTime * 0.47 + 1.8);
 
   // Simulated kick/pulse
   float pulse = pow(0.5 + 0.5 * sin(iTime * 1.2), 8.0) * 0.3;
@@ -145,11 +148,34 @@ void main() {
   float ballCShape = smootherstep(1.0 - clamp(ballCDist * ballCSize, 0.0, 1.0), 1.0, 0.99);
   vec3 ballCCol = (1.0 - ballCShape) * mix(color3In, color3Out, ballCShape) * 0.6;
 
+  // === LINE D - Electric Blue (ethereal, flowing) ===
+  float lineDWave = 0.018 + 0.028 * energy4;
+  float lineDFreq = 10.0 + 35.0 * energy4;
+  float lineDSpeed = 0.5 + 1.8 * energy4;
+  float lineDOffset = energy4 * 0.022 * sin(p.x * 12.0 - iTime * 1.0);
+
+  float lineDAnim = 0.5 + mouseInfluence
+    + lineDWave * sin(lineDFreq * p.x - lineDSpeed * iTime + 1.5)
+    + 0.016 * sin(p.x * 3.5 + iTime * 0.18 + 2.0)
+    + lineDOffset;
+
+  float lineDThick = lineThickness * (1.0 + energy4 * 0.35);
+  float lineDDist = distance(p.y, lineDAnim) * (2.0 / lineDThick);
+  float lineDShape = smootherstep(1.0 - clamp(lineDDist, 0.0, 1.0), 1.0, 0.99);
+  vec3 lineDCol = (1.0 - lineDShape) * mix(color4In, color4Out, lineDShape);
+
+  // Ball D
+  float ballDX = 0.35 + 0.12 * sin(iTime * 0.09 + 1.5);
+  float ballDDist = distance(p, vec2(ballDX, lineDAnim));
+  float ballDSize = 0.4 + 0.3 * energy4;
+  float ballDShape = smootherstep(1.0 - clamp(ballDDist * ballDSize, 0.0, 1.0), 1.0, 0.99);
+  vec3 ballDCol = (1.0 - ballDShape) * mix(color4In, color4Out, ballDShape) * 0.6;
+
   // Subtle pulse flash on background
   bgCol = mix(bgCol, bgCol * 1.3, pulse * 0.5);
 
   // Combine
-  vec3 fcolor = bgCol + lineACol + lineBCol + lineCCol + ballACol + ballBCol + ballCCol;
+  vec3 fcolor = bgCol + lineACol + lineBCol + lineCCol + lineDCol + ballACol + ballBCol + ballCCol + ballDCol;
 
   // Film grain
   fcolor = applyGrain(fcolor, p);
@@ -191,6 +217,8 @@ export default function WaveShader() {
       color2Out: { value: c(200, 50, 50) },
       color3In: { value: c(255, 150, 50) },
       color3Out: { value: c(200, 100, 0) },
+      color4In: { value: c(80, 160, 255) },   // Electric blue
+      color4Out: { value: c(30, 80, 200) },    // Deep blue
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],

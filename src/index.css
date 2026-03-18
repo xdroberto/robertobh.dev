@@ -13,34 +13,12 @@
   box-sizing: border-box;
 }
 
-html, body {
-  width: 100%;
-  height: 100%;
+html, body, #root {
+  width: 100dvw;
+  height: 100dvh;
   overflow: hidden;
   background-color: #0a0604;
   letter-spacing: -0.03em;
-}
-
-/* Hide default cursor on desktop */
-@media (min-width: 768px) {
-  html, body, a, button {
-    cursor: none;
-  }
-}
-
-/* Custom cursor */
-.custom-cursor {
-  position: fixed;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.5);
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  mix-blend-mode: difference;
-  z-index: 9999;
-  transition: width 0.2s, height 0.2s;
-  will-change: transform;
 }
 
 /* Noise overlay */
@@ -71,29 +49,6 @@ html, body {
   80% { transform: translate(-3%, 0); }
   90% { transform: translate(2%, 2%); }
   100% { transform: translate(1%, 0); }
-}
-
-/* Canvas positioning - force fullscreen */
-#root,
-#root > div {
-  width: 100vw !important;
-  height: 100vh !important;
-}
-
-canvas {
-  display: block !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-}
-
-/* R3F container override */
-div[data-reactroot] canvas,
-.fixed canvas {
-  width: 100vw !important;
-  height: 100vh !important;
 }
 
 /* Selection */
