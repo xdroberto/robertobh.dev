@@ -34,7 +34,7 @@ export default function App() {
           className="font-serif italic text-[clamp(0.7rem,1.2vw,1rem)] text-[#e0e0e0]/70 mb-6 tracking-wide"
           style={{ textShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.6)' }}
         >
-          Creative Developer &amp; Digital Craftsman
+          Creative Developer
         </motion.p>
 
         <motion.h1
