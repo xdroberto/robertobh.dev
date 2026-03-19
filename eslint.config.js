@@ -19,5 +19,20 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Strict: no unused vars (error, not warning)
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+      // No console.log in production code
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      // Enforce consistent returns
+      'consistent-return': 'off',
+      // React hooks exhaustive deps
+      'react-hooks/exhaustive-deps': 'warn',
+      // No explicit any
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
   },
 ])

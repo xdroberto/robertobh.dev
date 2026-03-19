@@ -26,11 +26,11 @@ function generateGrid(weeks: number, rows: number): number[][] {
 }
 
 const LEVEL_COLORS = [
-  'bg-[#161412]',        // 0 - empty
-  'bg-[#3a2a20]',        // 1 - low
-  'bg-[#6b4530]',        // 2 - medium
-  'bg-[#c47040]',        // 3 - high
-  'bg-[#ffcc00]',        // 4 - max
+  'bg-[#161412]', // 0 - empty
+  'bg-[#3a2a20]', // 1 - low
+  'bg-[#6b4530]', // 2 - medium
+  'bg-[#c47040]', // 3 - high
+  'bg-[#ffcc00]', // 4 - max
 ]
 
 export default function Activity() {
@@ -53,8 +53,8 @@ export default function Activity() {
         {/* Left: description + stats */}
         <div>
           <p className="text-sm sm:text-base leading-relaxed text-[#8a8480] mb-8 max-w-md">
-            Consistent contribution to open-source infrastructure and core system logic.
-            Monitoring repository commits and deployment cycles.
+            Consistent contribution to open-source infrastructure and core system logic. Monitoring
+            repository commits and deployment cycles.
           </p>
 
           {/* Stats row */}

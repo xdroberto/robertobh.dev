@@ -1,8 +1,14 @@
 import Section from '../components/layout/Section'
 
 const skills = [
-  'Python', 'Flask', 'React', 'TypeScript',
-  'Three.js', 'Tailwind CSS', 'SQLite', 'Git',
+  'Python',
+  'Flask',
+  'React',
+  'TypeScript',
+  'Three.js',
+  'Tailwind CSS',
+  'SQLite',
+  'Git',
 ]
 
 export default function About() {
@@ -14,12 +20,12 @@ export default function About() {
       <div className="grid md:grid-cols-2 gap-12">
         <div className="text-left">
           <p className="text-[var(--color-text-secondary)] leading-relaxed mb-4">
-            I'm a developer passionate about building clean, performant web applications
-            with a focus on user experience and modern design.
+            I'm a developer passionate about building clean, performant web applications with a
+            focus on user experience and modern design.
           </p>
           <p className="text-[var(--color-text-secondary)] leading-relaxed">
-            Currently working on interactive tools and creative projects that combine
-            functionality with visual polish.
+            Currently working on interactive tools and creative projects that combine functionality
+            with visual polish.
           </p>
         </div>
 

@@ -10,7 +10,6 @@ export default function Footer() {
   return (
     <footer id="contact" className="border-t border-[#2a2420]/50">
       <div className="max-w-6xl mx-auto px-5 sm:px-8 py-14 sm:py-16">
-
         {/* Main: CTA left, links right */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8 mb-12">
           <div className="max-w-sm">
@@ -52,7 +51,10 @@ export default function Footer() {
               Made in
               <span
                 className="inline-block w-2.5 h-[7px] rounded-[1px]"
-                style={{ background: 'linear-gradient(to right, #006847 33.33%, #fff 33.33%, #fff 66.66%, #ce1126 66.66%)' }}
+                style={{
+                  background:
+                    'linear-gradient(to right, #006847 33.33%, #fff 33.33%, #fff 66.66%, #ce1126 66.66%)',
+                }}
                 title="Mexico"
               />
             </span>

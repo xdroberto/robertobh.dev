@@ -20,7 +20,12 @@ export default function App() {
         <ErrorBoundary>
           <Canvas
             camera={{ position: [0, 0, 1] }}
-            gl={{ antialias: true, alpha: false, powerPreference: 'high-performance', failIfMajorPerformanceCaveat: false }}
+            gl={{
+              antialias: true,
+              alpha: false,
+              powerPreference: 'high-performance',
+              failIfMajorPerformanceCaveat: false,
+            }}
             dpr={[1, 2]}
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
           >
@@ -52,7 +57,10 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.8 }}
             className="font-display text-[clamp(2.5rem,8vw,7rem)] leading-[1.1] font-bold tracking-tight text-white uppercase mb-4"
-            style={{ textShadow: '0 0 40px rgba(0,0,0,0.9), 0 0 80px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.8)' }}
+            style={{
+              textShadow:
+                '0 0 40px rgba(0,0,0,0.9), 0 0 80px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.8)',
+            }}
           >
             Roberto BH
           </motion.h1>
@@ -104,7 +112,8 @@ export default function App() {
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             className="flex flex-col items-center gap-2"
           >
-            <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#e0e0e0]/20"
+            <span
+              className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#e0e0e0]/20"
               style={{ textShadow: '0 0 10px rgba(0,0,0,0.5)' }}
             >
               Scroll

@@ -81,18 +81,22 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         className="w-full text-left focus:outline-none"
       >
         {/* Card */}
-        <div className={`border border-[#2a2420] bg-[#0e0c0a] overflow-hidden transition-all duration-500 ${
-          expanded ? 'border-[#3a3430]' : 'hover:border-[#3a3430]'
-        }`}>
+        <div
+          className={`border border-[#2a2420] bg-[#0e0c0a] overflow-hidden transition-all duration-500 ${
+            expanded ? 'border-[#3a3430]' : 'hover:border-[#3a3430]'
+          }`}
+        >
           {/* Preview image area */}
           <div
             className="relative w-full h-40 sm:h-48 overflow-hidden"
             style={{ background: project.gradient }}
           >
             {/* Decorative overlay pattern */}
-            <div className="absolute inset-0 opacity-20"
+            <div
+              className="absolute inset-0 opacity-20"
               style={{
-                backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,204,0,0.06) 0%, transparent 40%)',
+                backgroundImage:
+                  'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,204,0,0.06) 0%, transparent 40%)',
               }}
             />
             {/* Project number */}
@@ -113,7 +117,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                 stroke="currentColor"
                 strokeWidth={1.5}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                />
               </motion.svg>
             </div>
           </div>
@@ -143,9 +151,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             </div>
 
             {/* Summary */}
-            <p className="text-xs sm:text-sm leading-relaxed text-[#8a8480]">
-              {project.summary}
-            </p>
+            <p className="text-xs sm:text-sm leading-relaxed text-[#8a8480]">{project.summary}</p>
           </div>
         </div>
       </button>
@@ -189,8 +195,18 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                   className="inline-flex items-center gap-2 font-mono text-[10px] sm:text-xs tracking-[0.15em] uppercase text-[#ffcc00]/70 hover:text-[#ffcc00] transition-colors duration-300"
                 >
                   <span>{project.linkLabel}</span>
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
+                    />
                   </svg>
                 </a>
               ) : (

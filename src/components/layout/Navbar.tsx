@@ -20,7 +20,9 @@ export default function Navbar() {
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+    }
   }, [menuOpen])
 
   const closeMenu = () => setMenuOpen(false)
@@ -41,7 +43,11 @@ export default function Navbar() {
           {/* Logo */}
           <a
             href="#"
-            onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); closeMenu() }}
+            onClick={(e) => {
+              e.preventDefault()
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+              closeMenu()
+            }}
             className="font-mono text-xs sm:text-sm tracking-[0.2em] text-[#e0dcd8]/80 hover:text-[#ffcc00] transition-colors duration-300"
           >
             RBH
@@ -66,9 +72,15 @@ export default function Navbar() {
             className="sm:hidden relative w-6 h-4 flex flex-col justify-between"
             aria-label="Toggle menu"
           >
-            <span className={`block w-full h-[1px] bg-[#e0dcd8]/70 transition-all duration-300 origin-center ${menuOpen ? 'rotate-45 translate-y-[7.5px]' : ''}`} />
-            <span className={`block w-full h-[1px] bg-[#e0dcd8]/70 transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
-            <span className={`block w-full h-[1px] bg-[#e0dcd8]/70 transition-all duration-300 origin-center ${menuOpen ? '-rotate-45 -translate-y-[7.5px]' : ''}`} />
+            <span
+              className={`block w-full h-[1px] bg-[#e0dcd8]/70 transition-all duration-300 origin-center ${menuOpen ? 'rotate-45 translate-y-[7.5px]' : ''}`}
+            />
+            <span
+              className={`block w-full h-[1px] bg-[#e0dcd8]/70 transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`}
+            />
+            <span
+              className={`block w-full h-[1px] bg-[#e0dcd8]/70 transition-all duration-300 origin-center ${menuOpen ? '-rotate-45 -translate-y-[7.5px]' : ''}`}
+            />
           </button>
         </div>
       </motion.nav>
