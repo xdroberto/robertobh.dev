@@ -5,19 +5,20 @@ interface SectionProps {
   id: string
   children: ReactNode
   className?: string
+  fullWidth?: boolean
 }
 
-export default function Section({ id, children, className = '' }: SectionProps) {
+export default function Section({ id, children, className = '', fullWidth = false }: SectionProps) {
   return (
     <motion.section
       id={id}
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-100px' }}
+      viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.7, ease: 'easeOut' }}
-      className={`py-24 px-6 ${className}`}
+      className={`py-16 sm:py-24 px-5 sm:px-8 ${className}`}
     >
-      <div className="max-w-6xl mx-auto">{children}</div>
+      <div className={fullWidth ? '' : 'max-w-6xl mx-auto'}>{children}</div>
     </motion.section>
   )
 }
