@@ -1,19 +1,26 @@
+import { lazy, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { motion } from 'framer-motion'
-import WaveShader from './components/three/WaveShader'
+import ErrorBoundary from './components/ErrorBoundary'
+
+const WaveShader = lazy(() => import('./components/three/WaveShader'))
 
 export default function App() {
   return (
     <div className="relative h-full w-full overflow-hidden bg-[#0a0604]">
-      {/* Shader background */}
-      <Canvas
-        camera={{ position: [0, 0, 1] }}
-        gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-        dpr={[1, 2]}
-        style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }}
-      >
-        <WaveShader />
-      </Canvas>
+      {/* Shader background - wrapped in error boundary so text always shows */}
+      <ErrorBoundary>
+        <Canvas
+          camera={{ position: [0, 0, 1] }}
+          gl={{ antialias: true, alpha: false, powerPreference: 'high-performance', failIfMajorPerformanceCaveat: false }}
+          dpr={[1, 2]}
+          style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }}
+        >
+          <Suspense fallback={null}>
+            <WaveShader />
+          </Suspense>
+        </Canvas>
+      </ErrorBoundary>
 
       {/* Noise overlay */}
       <div className="noise-overlay" />

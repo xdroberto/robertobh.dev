@@ -189,6 +189,9 @@ export default function WaveShader() {
   const { gl } = useThree()
   const mouse = useRef({ x: 0.5, y: 0.5 })
 
+  // Custom time accumulator - pauses when tab is hidden, caps delta per frame
+  const timeRef = useRef({ accumulated: 0, lastClock: -1, paused: false })
+
   const uniforms = useMemo(
     () => ({
       iResolution: { value: new THREE.Vector2(1, 1) },
@@ -210,10 +213,44 @@ export default function WaveShader() {
     [],
   )
 
+  // Pause/resume time when tab visibility changes
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.hidden) {
+        timeRef.current.paused = true
+      } else {
+        // Mark lastClock as stale so next frame resets delta
+        timeRef.current.paused = false
+        timeRef.current.lastClock = -1
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [])
+
   useFrame((state) => {
     const material = meshRef.current?.material as THREE.ShaderMaterial
     if (!material) return
-    material.uniforms.iTime.value = state.clock.elapsedTime
+
+    const clock = state.clock.elapsedTime
+    const t = timeRef.current
+
+    if (!t.paused) {
+      if (t.lastClock < 0) {
+        // First frame or returning from background - no delta
+        t.lastClock = clock
+      } else {
+        // Cap delta to 1/15s (~67ms) to prevent any jumps
+        const delta = Math.min(clock - t.lastClock, 1 / 15)
+        t.accumulated += delta
+        t.lastClock = clock
+      }
+    } else {
+      // While paused, keep updating lastClock to prevent delta buildup
+      t.lastClock = clock
+    }
+
+    material.uniforms.iTime.value = t.accumulated
     material.uniforms.iResolution.value.set(state.size.width, state.size.height)
     material.uniforms.iMouse.value.set(mouse.current.x, mouse.current.y)
   })
@@ -246,9 +283,13 @@ export default function WaveShader() {
     const canvas = gl.domElement
     const onLost = (e: Event) => {
       e.preventDefault()
+      // Pause time so animation doesn't jump when context restores
+      timeRef.current.paused = true
     }
     const onRestored = () => {
-      gl.compile(meshRef.current!.parent!, meshRef.current!.parent!.children[0] as THREE.Camera)
+      // Reset time tracking and resume - R3F handles recompilation
+      timeRef.current.paused = false
+      timeRef.current.lastClock = -1
     }
     canvas.addEventListener('webglcontextlost', onLost)
     canvas.addEventListener('webglcontextrestored', onRestored)
