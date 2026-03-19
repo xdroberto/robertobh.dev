@@ -35,6 +35,9 @@ uniform float lineThickness;
 // Grain
 uniform float grainIntensity;
 
+// Chromatic aberration
+uniform float caIntensity;
+
 varying vec2 vUv;
 
 float smootherstep(float edge0, float edge1, float x) {
@@ -173,7 +176,29 @@ void main() {
   // Combine
   vec3 fcolor = bgCol + lineACol + lineBCol + lineCCol + lineDCol + ballACol + ballBCol + ballCCol + ballDCol;
 
-  // Film grain
+  // Chromatic aberration - glass/lens effect
+  // Offset increases from center for natural lens distortion
+  vec2 center = p - 0.5;
+  float dist = length(center);
+  float caAmount = caIntensity * dist * dist; // stronger toward edges
+  vec2 caDir = normalize(center + 0.001) * caAmount;
+
+  // We can't re-render the scene at offset UVs in a single pass,
+  // so we shift the RGB channels of the final color using nearby pixels
+  // approximated by the gradient of the color field
+  vec3 colorR = fcolor * (1.0 + caAmount * 2.0);
+  vec3 colorB = fcolor * (1.0 - caAmount * 1.5);
+  fcolor = vec3(
+    mix(fcolor.r, colorR.r, 0.6),
+    fcolor.g,
+    mix(fcolor.b, colorB.b, 0.6)
+  );
+
+  // Subtle vignette to enhance the glass feel
+  float vignette = 1.0 - dist * dist * 0.3;
+  fcolor *= vignette;
+
+  // Film grain (reduced)
   fcolor = applyGrain(fcolor, p);
 
   gl_FragColor = vec4(fcolor, 1.0);
@@ -198,7 +223,8 @@ export default function WaveShader() {
       iTime: { value: 0 },
       iMouse: { value: new THREE.Vector2(0.5, 0.5) },
       lineThickness: { value: 1.8 },
-      grainIntensity: { value: 0.075 },
+      grainIntensity: { value: 0.03 },
+      caIntensity: { value: 0.15 },
       bgColorDown: { value: c(30, 12, 8) },
       bgColorUp: { value: c(12, 8, 4) },
       color1In: { value: c(255, 200, 0) },
