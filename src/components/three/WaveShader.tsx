@@ -66,71 +66,72 @@ void main() {
   // Subtle mouse influence
   float mouseInfluence = (iMouse.y - 0.5) * 0.03;
 
-  // Simulated audio-like energy using sine combinations (organic movement)
-  float energy1 = 0.5 + 0.5 * sin(iTime * 0.37) * sin(iTime * 0.53 + 1.2);
-  float energy2 = 0.5 + 0.5 * sin(iTime * 0.29 + 2.0) * sin(iTime * 0.67);
-  float energy3 = 0.5 + 0.5 * sin(iTime * 0.43 + 4.0) * sin(iTime * 0.31 + 0.7);
-  float energy4 = 0.5 + 0.5 * sin(iTime * 0.23 + 3.0) * sin(iTime * 0.47 + 1.8);
+  // Slow energy functions - long breathing cycles for elegance
+  float energy1 = 0.5 + 0.5 * sin(iTime * 0.15) * sin(iTime * 0.23 + 1.2);
+  float energy2 = 0.5 + 0.5 * sin(iTime * 0.12 + 2.0) * sin(iTime * 0.19);
+  float energy3 = 0.5 + 0.5 * sin(iTime * 0.18 + 4.0) * sin(iTime * 0.13 + 0.7);
+  float energy4 = 0.5 + 0.5 * sin(iTime * 0.10 + 3.0) * sin(iTime * 0.17 + 1.8);
 
-  // Simulated kick/pulse
-  float pulse = pow(0.5 + 0.5 * sin(iTime * 1.2), 8.0) * 0.3;
+  // Slow wide breathing - occasionally pushes waves apart for drama
+  float breath = 0.5 + 0.5 * sin(iTime * 0.06);
+  float breathWide = pow(breath, 3.0) * 0.08;
 
-  // === LINE A - Gold/Orange (bass-like, slow, wide) ===
-  float lineAWave = 0.02 + 0.03 * energy1 + pulse * 0.04;
-  float lineAFreq = 8.0 + 30.0 * energy1;
-  float lineASpeed = 0.4 + 1.5 * energy1;
-  float lineAOffset = energy1 * 0.03 * sin(p.x * 10.0 - iTime * 1.5);
+  // Rare gentle pulse (every ~12s, soft)
+  float pulse = pow(0.5 + 0.5 * sin(iTime * 0.5), 12.0) * 0.15;
+
+  // === LINE A - Gold/Orange (slow, majestic sweeps) ===
+  float lineAWave = 0.025 + 0.05 * energy1 + breathWide;
+  float lineAFreq = 3.0 + 6.0 * energy1;
+  float lineASpeed = 0.15 + 0.35 * energy1;
 
   float lineAAnim = 0.5 + mouseInfluence
     + lineAWave * sin(lineAFreq * p.x - lineASpeed * iTime)
-    + 0.02 * sin(p.x * 3.0 + iTime * 0.15)
-    + lineAOffset;
+    + 0.03 * sin(p.x * 1.5 + iTime * 0.07)
+    + energy1 * 0.015 * sin(p.x * 5.0 - iTime * 0.3);
 
-  float lineAThick = lineThickness * (1.0 + energy1 * 0.5 + pulse * 1.0);
+  float lineAThick = lineThickness * (1.0 + energy1 * 0.4 + pulse * 0.6);
   float lineADist = distance(p.y, lineAAnim) * (2.0 / lineAThick);
   float lineAShape = smootherstep(1.0 - clamp(lineADist, 0.0, 1.0), 1.0, 0.99);
   vec3 lineACol = (1.0 - lineAShape) * mix(color1In, color1Out, lineAShape);
 
   // Ball A
-  float ballAX = 0.2 + 0.15 * sin(iTime * 0.08);
+  float ballAX = 0.2 + 0.2 * sin(iTime * 0.03);
   float ballADist = distance(p, vec2(ballAX, lineAAnim));
-  float ballASize = 0.4 + 0.3 * energy1;
+  float ballASize = 0.35 + 0.25 * energy1;
   float ballAShape = smootherstep(1.0 - clamp(ballADist * ballASize, 0.0, 1.0), 1.0, 0.99);
-  vec3 ballACol = (1.0 - ballAShape) * mix(color1In, color1Out, ballAShape) * 0.6;
+  vec3 ballACol = (1.0 - ballAShape) * mix(color1In, color1Out, ballAShape) * 0.5;
 
-  // === LINE B - Red/Pink (mid-like, medium speed) ===
-  float lineBWave = 0.015 + 0.025 * energy2;
-  float lineBFreq = 12.0 + 40.0 * energy2;
-  float lineBSpeed = 0.6 + 2.0 * energy2;
-  float lineBOffset = energy2 * 0.025 * sin(p.x * 15.0 - iTime * 1.2);
+  // === LINE B - Red/Pink (graceful, medium curves) ===
+  float lineBWave = 0.02 + 0.04 * energy2 + breathWide * 0.8;
+  float lineBFreq = 4.0 + 8.0 * energy2;
+  float lineBSpeed = 0.2 + 0.4 * energy2;
 
   float lineBAnim = 0.5 + mouseInfluence
-    + lineBWave * sin(lineBFreq * p.x + lineBSpeed * iTime) * sin(lineBSpeed * iTime * 0.5)
-    + 0.015 * sin(p.x * 4.0 + iTime * 0.2 + 1.0)
-    + lineBOffset;
+    + lineBWave * sin(lineBFreq * p.x + lineBSpeed * iTime)
+    + 0.025 * sin(p.x * 2.0 + iTime * 0.09 + 1.0)
+    + energy2 * 0.012 * sin(p.x * 6.0 + iTime * 0.2);
 
-  float lineBThick = lineThickness * (1.0 + energy2 * 0.4);
+  float lineBThick = lineThickness * (1.0 + energy2 * 0.35);
   float lineBDist = distance(p.y, lineBAnim) * (2.0 / lineBThick);
   float lineBShape = smootherstep(1.0 - clamp(lineBDist, 0.0, 1.0), 1.0, 0.99);
   vec3 lineBCol = (1.0 - lineBShape) * mix(color2In, color2Out, lineBShape);
 
   // Ball B
-  float ballBX = 0.8 - 0.12 * sin(iTime * 0.1 + 2.0);
+  float ballBX = 0.8 - 0.15 * sin(iTime * 0.04 + 2.0);
   float ballBDist = distance(p, vec2(ballBX, lineBAnim));
-  float ballBSize = 0.4 + 0.3 * energy2;
+  float ballBSize = 0.35 + 0.25 * energy2;
   float ballBShape = smootherstep(1.0 - clamp(ballBDist * ballBSize, 0.0, 1.0), 1.0, 0.99);
-  vec3 ballBCol = (1.0 - ballBShape) * mix(color2In, color2Out, ballBShape) * 0.6;
+  vec3 ballBCol = (1.0 - ballBShape) * mix(color2In, color2Out, ballBShape) * 0.5;
 
-  // === LINE C - Orange (high-like, fast, complex) ===
-  float lineCWave = 0.012 + 0.02 * energy3;
-  float lineCFreq = 15.0 + 50.0 * energy3;
-  float lineCSpeed = 0.8 + 2.5 * energy3;
-  float lineCOffset = energy3 * 0.02 * sin(p.x * 20.0 - iTime * 0.8);
+  // === LINE C - Orange (delicate, flowing) ===
+  float lineCWave = 0.015 + 0.035 * energy3 + breathWide * 0.6;
+  float lineCFreq = 5.0 + 10.0 * energy3;
+  float lineCSpeed = 0.25 + 0.5 * energy3;
 
   float lineCAnim = 0.5 + mouseInfluence
-    + lineCWave * sin(lineCFreq * p.x + lineCSpeed * iTime) * sin(lineCSpeed * (iTime + 0.3))
-    + 0.018 * sin(p.x * 5.0 + iTime * 0.25 - 0.5)
-    + lineCOffset;
+    + lineCWave * sin(lineCFreq * p.x + lineCSpeed * iTime + 0.8)
+    + 0.02 * sin(p.x * 2.5 + iTime * 0.11 - 0.5)
+    + energy3 * 0.01 * sin(p.x * 7.0 - iTime * 0.15);
 
   float lineCThick = lineThickness * (1.0 + energy3 * 0.3);
   float lineCDist = distance(p.y, lineCAnim) * (2.0 / lineCThick);
@@ -138,22 +139,21 @@ void main() {
   vec3 lineCCol = (1.0 - lineCShape) * mix(color3In, color3Out, lineCShape);
 
   // Ball C
-  float ballCX = 0.5 + 0.1 * sin(iTime * 0.12 + 4.0);
+  float ballCX = 0.5 + 0.12 * sin(iTime * 0.05 + 4.0);
   float ballCDist = distance(p, vec2(ballCX, lineCAnim));
-  float ballCSize = 0.4 + 0.3 * energy3;
+  float ballCSize = 0.35 + 0.25 * energy3;
   float ballCShape = smootherstep(1.0 - clamp(ballCDist * ballCSize, 0.0, 1.0), 1.0, 0.99);
-  vec3 ballCCol = (1.0 - ballCShape) * mix(color3In, color3Out, ballCShape) * 0.6;
+  vec3 ballCCol = (1.0 - ballCShape) * mix(color3In, color3Out, ballCShape) * 0.5;
 
-  // === LINE D - Electric Blue (ethereal, flowing) ===
-  float lineDWave = 0.018 + 0.028 * energy4;
-  float lineDFreq = 10.0 + 35.0 * energy4;
-  float lineDSpeed = 0.5 + 1.8 * energy4;
-  float lineDOffset = energy4 * 0.022 * sin(p.x * 12.0 - iTime * 1.0);
+  // === LINE D - Electric Blue (ethereal, wide sweeps) ===
+  float lineDWave = 0.02 + 0.045 * energy4 + breathWide * 0.9;
+  float lineDFreq = 3.5 + 7.0 * energy4;
+  float lineDSpeed = 0.18 + 0.38 * energy4;
 
   float lineDAnim = 0.5 + mouseInfluence
     + lineDWave * sin(lineDFreq * p.x - lineDSpeed * iTime + 1.5)
-    + 0.016 * sin(p.x * 3.5 + iTime * 0.18 + 2.0)
-    + lineDOffset;
+    + 0.028 * sin(p.x * 1.8 + iTime * 0.08 + 2.0)
+    + energy4 * 0.014 * sin(p.x * 4.0 + iTime * 0.12);
 
   float lineDThick = lineThickness * (1.0 + energy4 * 0.35);
   float lineDDist = distance(p.y, lineDAnim) * (2.0 / lineDThick);
@@ -161,14 +161,14 @@ void main() {
   vec3 lineDCol = (1.0 - lineDShape) * mix(color4In, color4Out, lineDShape);
 
   // Ball D
-  float ballDX = 0.35 + 0.12 * sin(iTime * 0.09 + 1.5);
+  float ballDX = 0.35 + 0.15 * sin(iTime * 0.035 + 1.5);
   float ballDDist = distance(p, vec2(ballDX, lineDAnim));
-  float ballDSize = 0.4 + 0.3 * energy4;
+  float ballDSize = 0.35 + 0.25 * energy4;
   float ballDShape = smootherstep(1.0 - clamp(ballDDist * ballDSize, 0.0, 1.0), 1.0, 0.99);
-  vec3 ballDCol = (1.0 - ballDShape) * mix(color4In, color4Out, ballDShape) * 0.6;
+  vec3 ballDCol = (1.0 - ballDShape) * mix(color4In, color4Out, ballDShape) * 0.5;
 
   // Subtle pulse flash on background
-  bgCol = mix(bgCol, bgCol * 1.3, pulse * 0.5);
+  bgCol = mix(bgCol, bgCol * 1.2, pulse * 0.3);
 
   // Combine
   vec3 fcolor = bgCol + lineACol + lineBCol + lineCCol + lineDCol + ballACol + ballBCol + ballCCol + ballDCol;
