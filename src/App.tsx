@@ -57,26 +57,16 @@ export default function App() {
             Roberto BH
           </motion.h1>
 
-          {/* Location + timezone bar */}
-          <motion.div
+          {/* Location + timezone */}
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.2 }}
-            className="flex items-center gap-3 sm:gap-4 font-mono text-[10px] sm:text-xs tracking-[0.2em] uppercase text-[#e0e0e0]/40 mb-10"
+            className="font-mono text-[10px] sm:text-xs tracking-[0.25em] uppercase text-[#e0e0e0]/30 mb-10"
             style={{ textShadow: '0 0 15px rgba(0,0,0,0.7)' }}
           >
-            <span>LOC: USA</span>
-            <span className="text-[#ffcc00]/40">//</span>
-            <span>CST</span>
-            <span className="text-[#ffcc00]/40">//</span>
-            {/* Subtle MX flag as nationality indicator */}
-            <span className="flex items-center gap-1.5" title="Mexican nationality">
-              <span className="inline-block w-3 h-2 rounded-[1px] overflow-hidden flex-shrink-0" style={{
-                background: 'linear-gradient(to right, #006847 33.33%, #fff 33.33%, #fff 66.66%, #ce1126 66.66%)'
-              }} />
-              <span>MX</span>
-            </span>
-          </motion.div>
+            USA &middot; CST
+          </motion.p>
 
           {/* Links */}
           <motion.div
