@@ -5,6 +5,15 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
   --font-serif: 'Bodoni Moda', 'Georgia', serif;
   --font-display: 'Inter', system-ui, sans-serif;
+
+  --color-surface: #0a0604;
+  --color-surface-light: #141210;
+  --color-border: #2a2420;
+  --color-border-light: #3a3430;
+  --color-text: #e0dcd8;
+  --color-text-muted: #8a8480;
+  --color-accent: #ffcc00;
+  --color-accent-dim: #cc9900;
 }
 
 * {
@@ -13,17 +22,23 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+html {
+  scroll-behavior: smooth;
+  background-color: var(--color-surface);
+}
+
+body, #root {
   width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background-color: #0a0604;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--color-surface);
+  color: var(--color-text);
   letter-spacing: -0.03em;
 }
 
-/* Noise overlay */
+/* Noise overlay - hero only */
 .noise-overlay {
-  position: fixed;
+  position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
@@ -31,9 +46,8 @@ html, body, #root {
   background: transparent url("https://assets.iceable.com/img/noise-transparent.png") repeat 0 0;
   background-size: 300px 300px;
   animation: noise-animation 0.3s steps(5) infinite;
-  opacity: 0.6;
+  opacity: 0.5;
   will-change: transform;
-  z-index: 10;
   pointer-events: none;
 }
 
@@ -55,4 +69,25 @@ html, body, #root {
 ::selection {
   background-color: #ffcc00;
   color: #0a0604;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-light);
+}
+
+/* Section divider */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border) 20%, var(--color-border) 80%, transparent);
 }
