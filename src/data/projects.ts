@@ -44,6 +44,7 @@ export const PROJECTS: Project[] = [
     summary:
       'Creative studio exploring generative art, real-time visuals, and interactive experiences.',
     gradient: 'linear-gradient(135deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%)',
+    image: '/projects/side-effects-hero.webp',
     link: 'https://studio.robertobh.dev',
     linkLabel: 'Visit Studio',
     description:
@@ -80,7 +81,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 'moonhouse',
-    title: 'Moonhouse Bistro',
+    title: 'Moonhouse Restaurant',
     role: 'Designer & Creative Director',
     tags: ['Figma', 'Directus', 'Astro', 'CMS Architecture'],
     summary: 'Full brand design and CMS architecture for a restaurant in Fayetteville, AR.',
@@ -127,6 +128,7 @@ export const PROJECTS: Project[] = [
     tags: ['Python', 'Flask', 'SQLite', 'QR'],
     summary: 'Gift card management platform with role-based access.',
     gradient: 'linear-gradient(135deg, #0a1a0a 0%, #0e2d1f 50%, #143d26 100%)',
+    image: '/projects/giftcard-preview.webp',
     linkLabel: 'Case Study',
     description:
       'A self-hosted gift card management system built for Moonhouse restaurant. Handles card generation, redemption, recharging, and balance tracking with role-based access control.',

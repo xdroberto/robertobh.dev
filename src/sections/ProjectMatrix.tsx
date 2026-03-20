@@ -10,12 +10,10 @@ function ProjectCard({
   project,
   index,
   onOpen,
-  featured = false,
 }: {
   project: Project
   index: number
   onOpen: () => void
-  featured?: boolean
 }) {
   return (
     <motion.div
@@ -23,68 +21,43 @@ function ProjectCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group"
+      className="group h-full"
     >
       <button
         onClick={onOpen}
-        className="w-full text-left cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#ffcc00]/40"
+        className="w-full h-full text-left cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#ffcc00]/40"
       >
-        <div
-          className={`border border-[#2a2420]/70 bg-[#0e0c0a] rounded-sm overflow-hidden transition-all duration-500 ease-out group-hover:border-[#4a3e36] group-hover:shadow-[0_4px_30px_rgba(255,204,0,0.04)] group-hover:-translate-y-1 ${featured ? 'sm:flex sm:flex-row' : ''}`}
-        >
-          {/* Preview — image or gradient fallback */}
-          <div
-            className={`relative overflow-hidden transition-transform duration-700 ease-out group-hover:scale-[1.02] ${featured ? 'w-full sm:w-1/2 h-48 sm:h-72' : 'w-full h-48 sm:h-56'}`}
-            style={{ background: project.gradient }}
-          >
-            {project.image && (
-              <img
-                src={project.image}
-                alt={project.title}
-                className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
-                loading="lazy"
-              />
-            )}
-            <div
-              className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage:
-                  'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,204,0,0.06) 0%, transparent 40%)',
-              }}
-            />
-            {/* Number */}
-            <span className="absolute top-5 left-6 font-mono text-[10px] tracking-[0.2em] text-white/20">
-              {String(index + 1).padStart(2, '0')}
-            </span>
-            {/* Open indicator — animates on hover */}
-            <div className="absolute top-5 right-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <span className="font-mono text-[9px] tracking-[0.15em] uppercase text-white/50">
-                View Project
-              </span>
-              <svg
-                className="w-3.5 h-3.5 text-white/50 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
-                />
-              </svg>
-            </div>
-          </div>
-
+        <div className="h-full border border-[#2a2420]/70 bg-[#0e0c0a] rounded-sm overflow-hidden transition-all duration-500 ease-out group-hover:border-[#4a3e36] group-hover:shadow-[0_4px_30px_rgba(255,204,0,0.04)] group-hover:-translate-y-1 flex flex-col">
           {/* Card body */}
-          <div
-            className={`p-6 sm:p-7 ${featured ? 'sm:w-1/2 sm:flex sm:flex-col sm:justify-center' : ''}`}
-          >
+          <div className="p-6 sm:p-7 flex flex-col flex-1">
+            {/* Header row: number + open indicator */}
+            <div className="flex items-center justify-between mb-5">
+              <span className="font-mono text-[10px] tracking-[0.2em] text-[#8a8480]/25">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span className="font-mono text-[9px] tracking-[0.15em] uppercase text-[#8a8480]/40">
+                  View
+                </span>
+                <svg
+                  className="w-3.5 h-3.5 text-[#8a8480]/40 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Title & role */}
             <div className="flex flex-col gap-1.5 mb-4">
-              <h3
-                className={`font-display font-semibold tracking-tight text-[#e0dcd8] group-hover:text-white transition-colors duration-300 ${featured ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'}`}
-              >
+              <h3 className="font-display text-lg sm:text-xl font-semibold tracking-tight text-[#e0dcd8] group-hover:text-white transition-colors duration-300">
                 {project.title}
               </h3>
               <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.12em] uppercase text-[#8a8480]/40">
@@ -92,8 +65,36 @@ function ProjectCard({
               </span>
             </div>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-4">
+            {/* Summary */}
+            <p className="text-sm leading-relaxed text-[#8a8480]/70 mb-5">{project.summary}</p>
+
+            {/* Image preview — contained, elegant thumbnail */}
+            {project.image && (
+              <div className="mb-5 flex justify-center">
+                <div className="relative w-4/5 rounded overflow-hidden ring-1 ring-[#2a2420]/30 group-hover:ring-[#4a3e36]/40 transition-all duration-500 shadow-[0_2px_12px_rgba(0,0,0,0.3)] group-hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+                  <div className="aspect-[16/10] relative" style={{ background: project.gradient }}>
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-700 ease-out"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0e0c0a]/30 via-transparent to-[#0e0c0a]/10" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Gradient accent for cards without images */}
+            {!project.image && (
+              <div
+                className="relative rounded-sm overflow-hidden mb-5 h-1"
+                style={{ background: project.gradient }}
+              />
+            )}
+
+            {/* Tags — pushed to bottom */}
+            <div className="flex flex-wrap gap-2 mt-auto">
               {project.tags.map((tag) => (
                 <span
                   key={tag}
@@ -103,9 +104,6 @@ function ProjectCard({
                 </span>
               ))}
             </div>
-
-            {/* Summary */}
-            <p className="text-sm leading-relaxed text-[#8a8480]/70">{project.summary}</p>
           </div>
         </div>
       </button>
@@ -126,17 +124,15 @@ export default function ProjectMatrix() {
           </h2>
         </div>
 
-        {/* Project grid — featured first card, two below */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        {/* Project grid — equal cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {PROJECTS.map((project, i) => (
-            <div key={project.id} className={i === 0 ? 'lg:col-span-2' : ''}>
-              <ProjectCard
-                project={project}
-                index={i}
-                onOpen={() => setActiveProject(project)}
-                featured={i === 0}
-              />
-            </div>
+            <ProjectCard
+              key={project.id}
+              project={project}
+              index={i}
+              onOpen={() => setActiveProject(project)}
+            />
           ))}
         </div>
       </Section>

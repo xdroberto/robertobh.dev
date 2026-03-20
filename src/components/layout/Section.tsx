@@ -18,7 +18,7 @@ export default function Section({ id, children, className = '', fullWidth = fals
       transition={{ duration: 0.7, ease: 'easeOut' }}
       className={`py-20 sm:py-28 lg:py-32 px-5 sm:px-8 lg:px-12 ${className}`}
     >
-      <div className={fullWidth ? '' : 'max-w-6xl mx-auto'}>{children}</div>
+      <div className={fullWidth ? '' : 'max-w-7xl mx-auto'}>{children}</div>
     </motion.section>
   )
 }

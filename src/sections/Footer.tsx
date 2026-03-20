@@ -9,7 +9,7 @@ const LINKS = [
 export default function Footer() {
   return (
     <footer id="contact" className="border-t border-[#2a2420]/50">
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-12 py-16 sm:py-20 lg:py-24">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-16 sm:py-20 lg:py-24">
         {/* Main: CTA left, links right */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8 mb-12">
           <div className="max-w-sm">
