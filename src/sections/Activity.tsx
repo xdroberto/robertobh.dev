@@ -111,7 +111,7 @@ export default function Activity() {
 
         {/* Right: contribution grid — single animation on container, not 182 individual ones */}
         <motion.div
-          className="overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0"
+          className="overflow-x-auto -mx-5 px-5 sm:-mx-8 sm:px-8 lg:mx-0 lg:px-0"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

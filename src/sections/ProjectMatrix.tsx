@@ -71,7 +71,7 @@ function ProjectCard({
             {/* Image preview — contained, elegant thumbnail */}
             {project.image && (
               <div className="mb-5 flex justify-center">
-                <div className="relative w-4/5 rounded overflow-hidden ring-1 ring-[#2a2420]/30 group-hover:ring-[#4a3e36]/40 transition-all duration-500 shadow-[0_2px_12px_rgba(0,0,0,0.3)] group-hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+                <div className="relative w-4/5 max-h-48 sm:max-h-56 rounded overflow-hidden ring-1 ring-[#2a2420]/30 group-hover:ring-[#4a3e36]/40 transition-all duration-500 shadow-[0_2px_12px_rgba(0,0,0,0.3)] group-hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
                   <div className="aspect-[16/10] relative" style={{ background: project.gradient }}>
                     <img
                       src={project.image}
