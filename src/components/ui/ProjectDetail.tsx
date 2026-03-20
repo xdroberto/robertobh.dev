@@ -24,8 +24,15 @@ const fadeUp = {
 export default function ProjectDetail({ project }: { project: Project }) {
   return (
     <motion.div variants={stagger} initial="hidden" animate="visible">
-      {/* Header with gradient */}
+      {/* Header with image or gradient */}
       <div className="relative h-44 sm:h-56" style={{ background: project.gradient }}>
+        {project.image && (
+          <img
+            src={project.image}
+            alt={project.title}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
         <div
           className="absolute inset-0 opacity-20"
           style={{

@@ -10,10 +10,12 @@ function ProjectCard({
   project,
   index,
   onOpen,
+  featured = false,
 }: {
   project: Project
   index: number
   onOpen: () => void
+  featured?: boolean
 }) {
   return (
     <motion.div
@@ -27,10 +29,12 @@ function ProjectCard({
         onClick={onOpen}
         className="w-full text-left cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#ffcc00]/40"
       >
-        <div className="border border-[#2a2420]/70 bg-[#0e0c0a] rounded-sm overflow-hidden transition-all duration-500 ease-out group-hover:border-[#4a3e36] group-hover:shadow-[0_4px_30px_rgba(255,204,0,0.04)] group-hover:-translate-y-1">
+        <div
+          className={`border border-[#2a2420]/70 bg-[#0e0c0a] rounded-sm overflow-hidden transition-all duration-500 ease-out group-hover:border-[#4a3e36] group-hover:shadow-[0_4px_30px_rgba(255,204,0,0.04)] group-hover:-translate-y-1 ${featured ? 'sm:flex sm:flex-row' : ''}`}
+        >
           {/* Preview — image or gradient fallback */}
           <div
-            className="relative w-full h-48 sm:h-56 overflow-hidden transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+            className={`relative overflow-hidden transition-transform duration-700 ease-out group-hover:scale-[1.02] ${featured ? 'w-full sm:w-1/2 h-48 sm:h-72' : 'w-full h-48 sm:h-56'}`}
             style={{ background: project.gradient }}
           >
             {project.image && (
@@ -73,10 +77,14 @@ function ProjectCard({
             </div>
           </div>
 
-          {/* Card body — more padding and spacing */}
-          <div className="p-6 sm:p-7">
+          {/* Card body */}
+          <div
+            className={`p-6 sm:p-7 ${featured ? 'sm:w-1/2 sm:flex sm:flex-col sm:justify-center' : ''}`}
+          >
             <div className="flex flex-col gap-1.5 mb-4">
-              <h3 className="font-display text-lg sm:text-xl font-semibold tracking-tight text-[#e0dcd8] group-hover:text-white transition-colors duration-300">
+              <h3
+                className={`font-display font-semibold tracking-tight text-[#e0dcd8] group-hover:text-white transition-colors duration-300 ${featured ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'}`}
+              >
                 {project.title}
               </h3>
               <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.12em] uppercase text-[#8a8480]/40">
@@ -118,15 +126,17 @@ export default function ProjectMatrix() {
           </h2>
         </div>
 
-        {/* Project grid — more gap between cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        {/* Project grid — featured first card, two below */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {PROJECTS.map((project, i) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              index={i}
-              onOpen={() => setActiveProject(project)}
-            />
+            <div key={project.id} className={i === 0 ? 'lg:col-span-2' : ''}>
+              <ProjectCard
+                project={project}
+                index={i}
+                onOpen={() => setActiveProject(project)}
+                featured={i === 0}
+              />
+            </div>
           ))}
         </div>
       </Section>
