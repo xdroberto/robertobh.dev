@@ -81,48 +81,43 @@ export const PROJECTS: Project[] = [
   {
     id: 'moonhouse',
     title: 'Moonhouse Bistro',
-    role: 'Design & Architecture',
-    tags: ['Next.js', 'CMS', 'Dashboard'],
-    summary: 'Restaurant web presence with dynamic content management.',
+    role: 'Designer & Creative Director',
+    tags: ['Figma', 'Directus', 'Astro', 'CMS Architecture'],
+    summary: 'Full brand design and CMS architecture for a restaurant in Fayetteville, AR.',
     gradient: 'linear-gradient(135deg, #1a1a0a 0%, #2d1f0e 50%, #3d2614 100%)',
     link: 'https://moonhouse-ar.com',
     linkLabel: 'Visit Site',
     description:
-      'A full restaurant web platform with a custom dashboard for real-time content management. Designed to give the restaurant complete control over their digital presence without developer intervention.',
+      'Designed the complete visual identity and web experience for Moonhouse Coffee Bar & Bistro. Architected a fully CMS-driven system using Directus so restaurant owners can update every aspect of the site — menu, gallery, hours, text — without any developer involvement.',
     techStack: [
-      { name: 'Next.js', category: 'frontend' },
+      { name: 'Figma', category: 'tool' },
+      { name: 'Astro', category: 'frontend' },
       { name: 'React', category: 'frontend' },
       { name: 'Tailwind CSS', category: 'frontend' },
-      { name: 'Vercel', category: 'infra' },
-      { name: 'CMS Dashboard', category: 'backend' },
+      { name: 'Directus', category: 'backend' },
     ],
     sections: [
       {
-        title: 'Content Management',
+        title: 'Design Concept',
         content:
-          'A dashboard-driven CMS that allows non-technical staff to update menus, hours, events, and gallery images in real-time. Changes propagate instantly without redeployment.',
+          'Created the complete UI in Figma — from the textured psychedelic header to the warm black-and-gold palette that reflects the physical space. The design balances vintage charm with modern minimalism, matching the century-old house that Moonhouse inhabits.',
       },
       {
-        title: 'Design System',
+        title: 'CMS Architecture',
         content:
-          'Brand-consistent component library with responsive layouts optimized for the restaurant industry. Dark, warm color palette reflecting the physical restaurant ambiance.',
+          'Designed the Directus data model with 10+ collections: Gallery Images, Menu Items, Categories, Variants, Info Cards, Opening Hours, Banner, Landing Text, and more. Every visible element on the site is editable through the dashboard — a decision that proved critical when the restaurant changed its entire menu concept.',
       },
       {
-        title: 'SEO & Performance',
+        title: 'Developer Handoff',
         content:
-          'Server-side rendering for optimal search engine visibility. Structured data markup for restaurant discovery, optimized images, and sub-second load times.',
+          'Delivered pixel-perfect Figma specs to the development team (Dari Developer). Defined the content structure, API schema, and SEO strategy including Open Graph, JSON-LD, and multi-language support (English/Spanish).',
       },
     ],
     stats: [
-      { label: 'Lighthouse', value: '95+' },
-      { label: 'Load Time', value: '<1.5s' },
-      { label: 'Mobile Score', value: '98' },
+      { label: 'CMS Collections', value: '10+' },
+      { label: 'Menu Items', value: '36' },
+      { label: 'Languages', value: '2' },
     ],
-    testimonial: {
-      quote: 'The site perfectly captures the atmosphere of our restaurant. Our customers love it.',
-      author: 'Moonhouse Team',
-      role: 'Restaurant Owner',
-    },
   },
   {
     id: 'giftcard',
@@ -166,7 +161,7 @@ export const PROJECTS: Project[] = [
       },
     ],
     stats: [
-      { label: 'Test Coverage', value: '39 tests' },
+      { label: 'Tests', value: '117' },
       { label: 'Uptime', value: '99.9%' },
       { label: 'Backup', value: 'Daily' },
     ],
