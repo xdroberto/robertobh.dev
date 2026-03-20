@@ -49,12 +49,14 @@ export default function Footer() {
             <span>&middot;</span>
             <span className="flex items-center gap-1">
               Made in{' '}
-              <svg className="w-4 h-[10px] shrink-0" viewBox="0 0 60 36" aria-label="Mexico">
-                <rect width="20" height="36" fill="#006847" />
-                <rect x="20" width="20" height="36" fill="#fff" />
-                <rect x="40" width="20" height="36" fill="#ce1126" />
-                <circle cx="30" cy="18" r="4" fill="#6d3a1a" />
-              </svg>
+              <span
+                className="text-base leading-none"
+                role="img"
+                aria-label="Mexico"
+                style={{ color: 'initial', filter: 'brightness(1.1)' }}
+              >
+                🇲🇽
+              </span>
             </span>
           </div>
           <a
