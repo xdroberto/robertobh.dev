@@ -1,29 +1,6 @@
-import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import Section from '../components/layout/Section'
-
-// Generate a realistic-looking contribution grid
-function generateGrid(weeks: number, rows: number): number[][] {
-  const grid: number[][] = []
-  // Use a seeded approach for consistent rendering
-  let seed = 42
-  const rand = () => {
-    seed = (seed * 16807 + 0) % 2147483647
-    return seed / 2147483647
-  }
-
-  for (let w = 0; w < weeks; w++) {
-    const col: number[] = []
-    // Simulate burst patterns - some weeks are more active
-    const weekActivity = rand() > 0.3 ? rand() * 0.8 + 0.2 : rand() * 0.15
-    for (let d = 0; d < rows; d++) {
-      const val = rand() < weekActivity ? Math.ceil(rand() * 4) : 0
-      col.push(val)
-    }
-    grid.push(col)
-  }
-  return grid
-}
+import { useGitHubActivity } from '../hooks/useGitHubActivity'
 
 const LEVEL_COLORS = [
   'bg-[#161412]', // 0 - empty
@@ -34,31 +11,41 @@ const LEVEL_COLORS = [
 ]
 
 export default function Activity() {
-  const grid = useMemo(() => generateGrid(26, 7), [])
+  const { stats, grid, loading, isRealData } = useGitHubActivity()
 
-  const totalContributions = useMemo(() => {
-    return grid.flat().reduce((sum, v) => sum + v, 0)
-  }, [grid])
+  const totalCells = grid.flat().reduce((sum, v) => sum + v, 0)
 
   return (
     <Section id="activity">
       {/* Section label */}
       <div className="mb-10 sm:mb-14">
-        <span className="font-mono text-[10px] sm:text-xs tracking-[0.25em] uppercase text-[#8a8480]">
-          Engineering_Activity
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-[10px] sm:text-xs tracking-[0.25em] uppercase text-[#8a8480]">
+            Engineering_Activity
+          </span>
+          {loading && (
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#ffcc00] animate-pulse" />
+          )}
+          {isRealData && (
+            <span className="font-mono text-[8px] tracking-wider uppercase text-[#6b4530]">
+              Live
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-10 lg:gap-16">
         {/* Left: description + stats */}
         <div>
           <p className="text-sm sm:text-base leading-relaxed text-[#8a8480] mb-8 max-w-md">
-            Consistent contribution to open-source infrastructure and core system logic. Monitoring
-            repository commits and deployment cycles.
+            {isRealData
+              ? 'Real-time contribution data pulled from GitHub. Monitoring repository commits and deployment cycles.'
+              : 'Consistent contribution to open-source infrastructure and core system logic. Monitoring repository commits and deployment cycles.'}
           </p>
 
           {/* Stats row */}
-          <div className="flex gap-8 sm:gap-12">
+          <div className="flex flex-wrap gap-8 sm:gap-12">
+            {/* Contributions / Activity */}
             <div>
               <motion.span
                 initial={{ opacity: 0 }}
@@ -66,45 +53,78 @@ export default function Activity() {
                 viewport={{ once: true }}
                 className="block font-mono text-2xl sm:text-3xl font-bold text-[#e0dcd8]"
               >
-                {totalContributions}
+                {isRealData ? stats.totalContributions : totalCells}
               </motion.span>
               <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#8a8480] mt-1 block">
-                Contributions
+                {isRealData ? 'Events (90d)' : 'Contributions'}
               </span>
             </div>
+
+            {/* Repos */}
             <div>
-              <span className="block font-mono text-2xl sm:text-3xl font-bold text-[#e0dcd8]">
-                6
-              </span>
+              <motion.span
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                className="block font-mono text-2xl sm:text-3xl font-bold text-[#e0dcd8]"
+              >
+                {stats.publicRepos}
+              </motion.span>
               <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#8a8480] mt-1 block">
                 Repositories
               </span>
             </div>
+
+            {/* Languages */}
             <div>
-              <span className="block font-mono text-2xl sm:text-3xl font-bold text-[#e0dcd8]">
-                24ms
-              </span>
+              <motion.span
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                className="block font-mono text-2xl sm:text-3xl font-bold text-[#e0dcd8]"
+              >
+                {stats.languages.length}
+              </motion.span>
               <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#8a8480] mt-1 block">
-                Avg Latency
+                Languages
               </span>
             </div>
+
+            {/* Top language */}
+            {stats.languages.length > 0 && (
+              <div>
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  className="block font-mono text-2xl sm:text-3xl font-bold text-[#ffcc00]"
+                >
+                  {stats.languages[0].name}
+                </motion.span>
+                <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#8a8480] mt-1 block">
+                  Primary
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Right: contribution grid */}
-        <div className="overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0">
+        {/* Right: contribution grid — single animation on container, not 182 individual ones */}
+        <motion.div
+          className="overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          aria-hidden="true"
+        >
           <div className="flex gap-[3px] w-max">
             {grid.map((week, wi) => (
               <div key={wi} className="flex flex-col gap-[3px]">
                 {week.map((level, di) => (
-                  <motion.div
+                  <div
                     key={`${wi}-${di}`}
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.2, delay: wi * 0.01 + di * 0.005 }}
-                    className={`w-[10px] h-[10px] sm:w-3 sm:h-3 rounded-[2px] ${LEVEL_COLORS[level]} transition-colors`}
-                    title={`Level ${level}`}
+                    className={`w-[10px] h-[10px] sm:w-3 sm:h-3 rounded-[2px] ${LEVEL_COLORS[level]}`}
                   />
                 ))}
               </div>
@@ -125,7 +145,7 @@ export default function Activity() {
               More
             </span>
           </div>
-        </div>
+        </motion.div>
       </div>
     </Section>
   )

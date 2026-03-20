@@ -69,17 +69,18 @@ export default function Navbar() {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="sm:hidden relative w-6 h-4 flex flex-col justify-between"
+            className="sm:hidden relative w-10 h-10 flex flex-col items-center justify-center gap-[5px] -mr-2"
             aria-label="Toggle menu"
+            aria-expanded={menuOpen}
           >
             <span
-              className={`block w-full h-[1px] bg-[#e0dcd8]/70 transition-all duration-300 origin-center ${menuOpen ? 'rotate-45 translate-y-[7.5px]' : ''}`}
+              className={`block w-5 h-[1px] bg-[#e0dcd8]/70 transition-all duration-300 origin-center ${menuOpen ? 'rotate-45 translate-y-[6px]' : ''}`}
             />
             <span
-              className={`block w-full h-[1px] bg-[#e0dcd8]/70 transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`}
+              className={`block w-5 h-[1px] bg-[#e0dcd8]/70 transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`}
             />
             <span
-              className={`block w-full h-[1px] bg-[#e0dcd8]/70 transition-all duration-300 origin-center ${menuOpen ? '-rotate-45 -translate-y-[7.5px]' : ''}`}
+              className={`block w-5 h-[1px] bg-[#e0dcd8]/70 transition-all duration-300 origin-center ${menuOpen ? '-rotate-45 -translate-y-[6px]' : ''}`}
             />
           </button>
         </div>

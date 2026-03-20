@@ -1,73 +1,20 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Section from '../components/layout/Section'
+import Modal from '../components/ui/Modal'
+import ProjectDetail from '../components/ui/ProjectDetail'
+import { PROJECTS } from '../data/projects'
+import type { Project } from '../data/projects'
 
-interface Project {
-  id: string
-  title: string
-  role: string
-  tags: string[]
-  summary: string
-  details: string[]
-  link?: string
-  linkLabel?: string
-  // Gradient colors for placeholder preview
-  gradient: string
-}
-
-const PROJECTS: Project[] = [
-  {
-    id: 'side-effects',
-    title: 'Side Effects Studio',
-    role: 'Creator & Lead Developer',
-    tags: ['React', 'WebGL', 'Three.js', 'GLSL'],
-    summary: 'Generative audio-visual environment with real-time rendering.',
-    details: [
-      'Custom GLSL fragment shaders with multi-wave synthesis and chromatic aberration',
-      'Real-time audio-reactive rendering pipeline using Web Audio API',
-      'Interactive mouse/touch influence on shader parameters',
-      'Optimized for mobile with adaptive DPR and context loss recovery',
-    ],
-    link: 'https://studio.robertobh.dev',
-    linkLabel: 'Launch Studio',
-    gradient: 'linear-gradient(135deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%)',
-  },
-  {
-    id: 'moonhouse',
-    title: 'Moonhouse Bistro',
-    role: 'Design & Architecture',
-    tags: ['Next.js', 'CMS', 'Dashboard'],
-    summary: 'Restaurant web presence with dynamic content management.',
-    details: [
-      'Dashboard-driven CMS for real-time menu and content updates',
-      'Architectural decisions for reservation flow and operational control',
-      'Responsive design system with brand-consistent components',
-      'SEO optimization and performance tuning for restaurant discovery',
-    ],
-    link: 'https://moonhouse-ar.com',
-    linkLabel: 'Visit Site',
-    gradient: 'linear-gradient(135deg, #1a1a0a 0%, #2d1f0e 50%, #3d2614 100%)',
-  },
-  {
-    id: 'giftcard',
-    title: 'Giftcard System',
-    role: 'Full-Stack Developer',
-    tags: ['Python', 'Flask', 'SQLite', 'QR'],
-    summary: 'Gift card management platform with role-based access.',
-    details: [
-      'QR code and Code128 barcode generation per card with unique 16-char identifiers',
-      'Role-based access: admin (full control) and cashier (redeem/verify/recharge)',
-      'Integer-cent money storage for precision, with real-time balance tracking',
-      'Production deployment with Gunicorn, Nginx, SSL, and automated daily backups',
-    ],
-    linkLabel: 'Case Study',
-    gradient: 'linear-gradient(135deg, #0a1a0a 0%, #0e2d1f 50%, #143d26 100%)',
-  },
-]
-
-function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const [expanded, setExpanded] = useState(false)
-
+function ProjectCard({
+  project,
+  index,
+  onOpen,
+}: {
+  project: Project
+  index: number
+  onOpen: () => void
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -77,21 +24,15 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       className="group"
     >
       <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full text-left focus:outline-none"
+        onClick={onOpen}
+        className="w-full text-left cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#ffcc00]/40"
       >
-        {/* Card */}
-        <div
-          className={`border border-[#2a2420] bg-[#0e0c0a] overflow-hidden transition-all duration-500 ${
-            expanded ? 'border-[#3a3430]' : 'hover:border-[#3a3430]'
-          }`}
-        >
-          {/* Preview image area */}
+        <div className="border border-[#2a2420]/70 bg-[#0e0c0a] rounded-sm overflow-hidden transition-all duration-500 ease-out group-hover:border-[#4a3e36] group-hover:shadow-[0_4px_30px_rgba(255,204,0,0.04)] group-hover:-translate-y-1">
+          {/* Preview gradient — taller for breathing room */}
           <div
-            className="relative w-full h-40 sm:h-48 overflow-hidden"
+            className="relative w-full h-48 sm:h-56 overflow-hidden transition-transform duration-700 ease-out group-hover:scale-[1.02]"
             style={{ background: project.gradient }}
           >
-            {/* Decorative overlay pattern */}
             <div
               className="absolute inset-0 opacity-20"
               style={{
@@ -99,19 +40,17 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                   'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,204,0,0.06) 0%, transparent 40%)',
               }}
             />
-            {/* Project number */}
-            <span className="absolute top-4 left-5 font-mono text-[10px] tracking-[0.2em] text-white/20">
+            {/* Number */}
+            <span className="absolute top-5 left-6 font-mono text-[10px] tracking-[0.2em] text-white/20">
               {String(index + 1).padStart(2, '0')}
             </span>
-            {/* Expand indicator */}
-            <div className="absolute top-4 right-5 flex items-center gap-2">
-              <span className="font-mono text-[9px] tracking-[0.15em] uppercase text-white/20">
-                {expanded ? 'Close' : 'Details'}
+            {/* Open indicator — animates on hover */}
+            <div className="absolute top-5 right-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <span className="font-mono text-[9px] tracking-[0.15em] uppercase text-white/50">
+                View Project
               </span>
-              <motion.svg
-                animate={{ rotate: expanded ? 180 : 0 }}
-                transition={{ duration: 0.3 }}
-                className="w-3.5 h-3.5 text-white/20"
+              <svg
+                className="w-3.5 h-3.5 text-white/50 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -120,30 +59,29 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                  d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
                 />
-              </motion.svg>
+              </svg>
             </div>
           </div>
 
-          {/* Card body */}
-          <div className="p-5 sm:p-6">
-            {/* Title + role */}
-            <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 sm:gap-4 mb-3">
-              <h3 className="font-display text-base sm:text-lg font-semibold tracking-tight text-[#e0dcd8] group-hover:text-white transition-colors duration-300">
+          {/* Card body — more padding and spacing */}
+          <div className="p-6 sm:p-7">
+            <div className="flex flex-col gap-1.5 mb-4">
+              <h3 className="font-display text-lg sm:text-xl font-semibold tracking-tight text-[#e0dcd8] group-hover:text-white transition-colors duration-300">
                 {project.title}
               </h3>
-              <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.1em] uppercase text-[#8a8480]/50 shrink-0">
+              <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.12em] uppercase text-[#8a8480]/40">
                 {project.role}
               </span>
             </div>
 
             {/* Tags */}
-            <div className="flex flex-wrap gap-1.5 mb-3">
+            <div className="flex flex-wrap gap-2 mb-4">
               {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="font-mono text-[9px] tracking-[0.08em] uppercase px-2 py-0.5 border border-[#2a2420]/60 text-[#8a8480]/50"
+                  className="font-mono text-[9px] tracking-[0.08em] uppercase px-2.5 py-1 border border-[#2a2420]/50 text-[#8a8480]/40 rounded-sm group-hover:border-[#3a3430]/60 group-hover:text-[#8a8480]/60 transition-colors duration-300"
                 >
                   {tag}
                 </span>
@@ -151,93 +89,48 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             </div>
 
             {/* Summary */}
-            <p className="text-xs sm:text-sm leading-relaxed text-[#8a8480]">{project.summary}</p>
+            <p className="text-sm leading-relaxed text-[#8a8480]/70">{project.summary}</p>
           </div>
         </div>
       </button>
-
-      {/* Expanded details */}
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-            className="overflow-hidden"
-          >
-            <div className="border border-t-0 border-[#2a2420] bg-[#0c0a08] px-5 sm:px-6 py-5 sm:py-6">
-              {/* Technical details */}
-              <h4 className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#8a8480]/60 mb-4">
-                Technical Highlights
-              </h4>
-              <ul className="space-y-2.5 mb-6">
-                {project.details.map((detail, i) => (
-                  <motion.li
-                    key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.06 }}
-                    className="flex items-start gap-3 text-xs sm:text-sm leading-relaxed text-[#8a8480]"
-                  >
-                    <span className="text-[#ffcc00]/40 mt-1 shrink-0">&mdash;</span>
-                    {detail}
-                  </motion.li>
-                ))}
-              </ul>
-
-              {/* Link */}
-              {project.link ? (
-                <a
-                  href={project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 font-mono text-[10px] sm:text-xs tracking-[0.15em] uppercase text-[#ffcc00]/70 hover:text-[#ffcc00] transition-colors duration-300"
-                >
-                  <span>{project.linkLabel}</span>
-                  <svg
-                    className="w-3.5 h-3.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
-                    />
-                  </svg>
-                </a>
-              ) : (
-                <span className="font-mono text-[10px] sm:text-xs tracking-[0.15em] uppercase text-[#8a8480]/30">
-                  {project.linkLabel || 'Coming soon'}
-                </span>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   )
 }
 
 export default function ProjectMatrix() {
-  return (
-    <Section id="projects">
-      {/* Section header */}
-      <div className="mb-10 sm:mb-12">
-        <h2 className="font-mono text-[10px] sm:text-xs tracking-[0.25em] uppercase text-[#8a8480]">
-          Selected Work
-        </h2>
-      </div>
+  const [activeProject, setActiveProject] = useState<Project | null>(null)
 
-      {/* Project grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-        {PROJECTS.map((project, i) => (
-          <ProjectCard key={project.id} project={project} index={i} />
-        ))}
-      </div>
-    </Section>
+  return (
+    <>
+      <Section id="projects">
+        {/* Section header */}
+        <div className="mb-12 sm:mb-16">
+          <h2 className="font-mono text-[10px] sm:text-xs tracking-[0.25em] uppercase text-[#8a8480]">
+            Selected Work
+          </h2>
+        </div>
+
+        {/* Project grid — more gap between cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {PROJECTS.map((project, i) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              index={i}
+              onOpen={() => setActiveProject(project)}
+            />
+          ))}
+        </div>
+      </Section>
+
+      {/* Project detail modal */}
+      <Modal
+        isOpen={activeProject !== null}
+        onClose={() => setActiveProject(null)}
+        title={activeProject?.title}
+      >
+        {activeProject && <ProjectDetail project={activeProject} />}
+      </Modal>
+    </>
   )
 }

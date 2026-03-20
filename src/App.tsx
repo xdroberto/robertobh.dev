@@ -87,13 +87,13 @@ export default function App() {
               href="https://github.com/xdroberto"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs sm:text-sm text-[#e0e0e0]/40 hover:text-[#ffcc00] transition-colors duration-300 tracking-widest uppercase font-mono"
+              className="px-4 py-3 text-xs sm:text-sm text-[#e0e0e0]/40 hover:text-[#ffcc00] transition-colors duration-300 tracking-widest uppercase font-mono"
             >
               GitHub
             </a>
             <a
               href="mailto:robertobecerrilhurtado@gmail.com"
-              className="text-xs sm:text-sm text-[#e0e0e0]/40 hover:text-[#ffcc00] transition-colors duration-300 tracking-widest uppercase font-mono"
+              className="px-4 py-3 text-xs sm:text-sm text-[#e0e0e0]/40 hover:text-[#ffcc00] transition-colors duration-300 tracking-widest uppercase font-mono"
             >
               Contact
             </a>
