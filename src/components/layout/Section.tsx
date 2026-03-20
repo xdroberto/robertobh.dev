@@ -14,7 +14,7 @@ export default function Section({ id, children, className = '', fullWidth = fals
       id={id}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
+      viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.7, ease: 'easeOut' }}
       className={`py-20 sm:py-28 lg:py-32 px-5 sm:px-8 lg:px-12 ${className}`}
     >

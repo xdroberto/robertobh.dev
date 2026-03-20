@@ -116,7 +116,7 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="relative z-10 w-full max-w-3xl mx-4 sm:mx-6 my-8 sm:my-16"
+            className="relative z-10 w-full max-w-3xl xl:max-w-[45%] mx-4 sm:mx-6 my-8 sm:my-16"
             role="dialog"
             aria-modal="true"
             aria-label={title ?? 'Project details'}
@@ -125,7 +125,7 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 z-20 p-3 -m-1 text-[#8a8480]/40 hover:text-[#e0dcd8] transition-colors duration-200"
+                className="absolute top-4 right-4 z-10 p-3 -m-1 text-[#8a8480]/40 hover:text-[#e0dcd8] transition-colors duration-200"
                 aria-label="Close"
               >
                 <svg

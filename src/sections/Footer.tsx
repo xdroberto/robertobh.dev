@@ -26,7 +26,7 @@ export default function Footer() {
             </p>
           </div>
 
-          <div className="flex flex-row sm:flex-col items-start gap-3 sm:gap-2.5 sm:items-end">
+          <div className="flex flex-row sm:flex-col items-start gap-3 sm:items-end">
             {LINKS.map((link) => (
               <a
                 key={link.label}

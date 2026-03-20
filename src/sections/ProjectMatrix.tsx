@@ -88,7 +88,7 @@ function ProjectCard({
             {/* Gradient accent for cards without images */}
             {!project.image && (
               <div
-                className="relative rounded-sm overflow-hidden mb-5 h-1"
+                className="relative rounded-sm overflow-hidden mb-5 h-1.5"
                 style={{ background: project.gradient }}
               />
             )}

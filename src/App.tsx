@@ -123,13 +123,13 @@ export default function App() {
             className="flex flex-col items-center gap-2"
           >
             <span
-              className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#e0e0e0]/20"
+              className="hidden sm:block font-mono text-[9px] tracking-[0.2em] uppercase text-[#e0e0e0]/20"
               style={{ textShadow: '0 0 10px rgba(0,0,0,0.5)' }}
             >
               Scroll
             </span>
             <svg
-              className="w-4 h-4 text-[#e0e0e0]/20"
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#e0e0e0]/20"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
