@@ -20,6 +20,7 @@ export interface Project {
   tags: string[]
   summary: string
   gradient: string
+  image?: string // path relative to public/ e.g. '/projects/moonhouse-hero.webp'
   link?: string
   linkLabel?: string
   // Extended data for modal
@@ -38,44 +39,43 @@ export const PROJECTS: Project[] = [
   {
     id: 'side-effects',
     title: 'Side Effects Studio',
-    role: 'Creator & Lead Developer',
-    tags: ['React', 'WebGL', 'Three.js', 'GLSL'],
-    summary: 'Generative audio-visual environment with real-time rendering.',
+    role: 'Designer, Artist & Developer',
+    tags: ['TouchDesigner', 'GLSL', 'Three.js', 'p5.js', 'Processing'],
+    summary:
+      'Creative studio exploring generative art, real-time visuals, and interactive experiences.',
     gradient: 'linear-gradient(135deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%)',
     link: 'https://studio.robertobh.dev',
-    linkLabel: 'Launch Studio',
+    linkLabel: 'Visit Studio',
     description:
-      'An interactive creative coding platform that merges generative art with real-time audio analysis. Built as a playground for shader experimentation and audio-reactive visuals.',
+      'Side Effects is my creative studio — a space for exploring the intersection of art, code, and real-time systems. From generative visuals and shader experiments to interactive installations, the studio is where I push the boundaries of creative technology.',
     techStack: [
-      { name: 'React 19', category: 'frontend' },
-      { name: 'React Three Fiber', category: 'frontend' },
-      { name: 'Three.js', category: 'frontend' },
+      { name: 'TouchDesigner', category: 'tool' },
       { name: 'GLSL', category: 'frontend' },
-      { name: 'Web Audio API', category: 'frontend' },
-      { name: 'TypeScript', category: 'tool' },
-      { name: 'Vite', category: 'tool' },
+      { name: 'Three.js', category: 'frontend' },
+      { name: 'p5.js', category: 'frontend' },
+      { name: 'Processing', category: 'tool' },
     ],
     sections: [
       {
-        title: 'Shader Pipeline',
+        title: 'Generative Visuals',
         content:
-          'Custom GLSL fragment shaders with multi-wave synthesis, chromatic aberration, and noise-based distortion. The rendering pipeline adapts in real-time to audio frequency data, creating a direct link between sound and visuals.',
+          'Real-time generative systems built with TouchDesigner and custom GLSL shaders. Audio-reactive compositions, particle systems, and procedural animations that evolve organically.',
       },
       {
-        title: 'Audio Integration',
+        title: 'Creative Coding',
         content:
-          'The Web Audio API analyzes incoming audio streams to extract frequency bins and amplitude data. These values drive shader uniforms, allowing visual parameters like wave intensity, color shifts, and distortion to respond organically to music.',
+          'Experiments in p5.js, Processing, and Three.js — from algorithmic patterns and noise fields to interactive web-based installations. Each piece explores a different aspect of computational aesthetics.',
       },
       {
-        title: 'Performance',
+        title: 'Web Experiences',
         content:
-          'Adaptive DPR scaling based on device capabilities, efficient uniform updates without re-compilation, and WebGL context loss recovery. The system gracefully degrades on mobile while maintaining visual fidelity on desktop.',
+          'Interactive browser-based experiences using WebGL, React Three Fiber, and custom shaders. The studio site itself is a showcase of these technologies working together.',
       },
     ],
     stats: [
-      { label: 'Shaders', value: '4+' },
-      { label: 'Avg FPS', value: '60' },
-      { label: 'Bundle', value: '<200KB' },
+      { label: 'Tools', value: '5+' },
+      { label: 'Medium', value: 'Real-time' },
+      { label: 'Focus', value: 'Generative' },
     ],
   },
   {
@@ -85,6 +85,7 @@ export const PROJECTS: Project[] = [
     tags: ['Figma', 'Directus', 'Astro', 'CMS Architecture'],
     summary: 'Full brand design and CMS architecture for a restaurant in Fayetteville, AR.',
     gradient: 'linear-gradient(135deg, #1a1a0a 0%, #2d1f0e 50%, #3d2614 100%)',
+    image: '/projects/moonhouse-hero.webp',
     link: 'https://moonhouse-ar.com',
     linkLabel: 'Visit Site',
     description:

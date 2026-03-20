@@ -28,11 +28,19 @@ function ProjectCard({
         className="w-full text-left cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#ffcc00]/40"
       >
         <div className="border border-[#2a2420]/70 bg-[#0e0c0a] rounded-sm overflow-hidden transition-all duration-500 ease-out group-hover:border-[#4a3e36] group-hover:shadow-[0_4px_30px_rgba(255,204,0,0.04)] group-hover:-translate-y-1">
-          {/* Preview gradient — taller for breathing room */}
+          {/* Preview — image or gradient fallback */}
           <div
             className="relative w-full h-48 sm:h-56 overflow-hidden transition-transform duration-700 ease-out group-hover:scale-[1.02]"
             style={{ background: project.gradient }}
           >
+            {project.image && (
+              <img
+                src={project.image}
+                alt={project.title}
+                className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+                loading="lazy"
+              />
+            )}
             <div
               className="absolute inset-0 opacity-20"
               style={{
