@@ -96,7 +96,7 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain"
           variants={backdrop}
           initial="hidden"
           animate="visible"

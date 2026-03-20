@@ -33,7 +33,7 @@ export default function Navbar() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
           scrolled
             ? 'bg-[#0a0604]/80 backdrop-blur-xl border-b border-[#2a2420]/50'
             : 'bg-transparent'
@@ -94,7 +94,7 @@ export default function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-[#0a0604]/95 backdrop-blur-2xl flex flex-col items-center justify-center gap-10"
+            className="fixed inset-0 z-30 bg-[#0a0604]/95 backdrop-blur-2xl flex flex-col items-center justify-center gap-10"
           >
             {NAV_ITEMS.map((item, i) => (
               <motion.a
