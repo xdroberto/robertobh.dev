@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { motion } from 'framer-motion'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -10,6 +10,16 @@ import Footer from './sections/Footer'
 const WaveShader = lazy(() => import('./components/three/WaveShader'))
 
 export default function App() {
+  useEffect(() => {
+    // Force scroll to top on mount — bypass smooth scrolling
+    document.documentElement.style.scrollBehavior = 'auto'
+    window.scrollTo(0, 0)
+    // Restore smooth scrolling after a tick
+    requestAnimationFrame(() => {
+      document.documentElement.style.scrollBehavior = ''
+    })
+  }, [])
+
   return (
     <div className="bg-[#0a0604]">
       <Navbar />

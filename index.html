@@ -11,6 +11,11 @@
     <title>Roberto BH | Developer</title>
   </head>
   <body>
+    <script>
+      history.scrollRestoration='manual';
+      if(location.hash){history.replaceState(null,'',location.pathname);}
+      window.scrollTo(0,0);
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
