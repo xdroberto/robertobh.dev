@@ -6,6 +6,14 @@ export interface ContributionDay {
   count: number
 }
 
+// Shape returned by github-contributions-api.jogruber.de/v4/<user>?y=last
+// Mirrors the public contribution calendar shown on github.com/<user>,
+// which counts both public and private contributions.
+export interface ContributionsApiResponse {
+  total: { lastYear: number } & Record<string, number>
+  contributions: ContributionDay[]
+}
+
 export interface GitHubEvent {
   type: string
   created_at: string
@@ -111,4 +119,25 @@ export function countLanguages(repos: GitHubRepo[]): { name: string; count: numb
   return Array.from(counts.entries())
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count)
+}
+
+export function findLastContribution(contributions: ContributionDay[]): ContributionDay | null {
+  let last: ContributionDay | null = null
+  for (const c of contributions) {
+    if (c.count > 0 && (!last || c.date > last.date)) last = c
+  }
+  return last
+}
+
+export function formatRelativeDays(date: string, now: Date = new Date()): string {
+  const target = new Date(date + 'T00:00:00')
+  const today = new Date(now.toISOString().slice(0, 10) + 'T00:00:00')
+  const diffMs = today.getTime() - target.getTime()
+  const days = Math.round(diffMs / (1000 * 60 * 60 * 24))
+  if (days <= 0) return 'today'
+  if (days === 1) return 'yesterday'
+  if (days < 7) return `${days}d ago`
+  if (days < 30) return `${Math.floor(days / 7)}w ago`
+  if (days < 365) return `${Math.floor(days / 30)}mo ago`
+  return `${Math.floor(days / 365)}y ago`
 }

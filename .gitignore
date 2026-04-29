@@ -10,7 +10,20 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+coverage
 *.local
+
+# Claude / agent workspace (not part of project)
+.claude/plans/
+.claude/projects/
+.claude/worktrees/
+.claude/settings.json
+.claude/settings.local.json
+.playwright-mcp/
+
+# Local debug screenshots in repo root (do not commit)
+/*.png
+/*.jpg
 
 # Editor directories and files
 .vscode/*

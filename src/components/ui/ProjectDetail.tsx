@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import TechIcon from '../icons/TechIcon'
 import type { Project } from '../../data/projects'
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -25,7 +26,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
   return (
     <motion.div variants={stagger} initial="hidden" animate="visible">
       {/* Header with image or gradient */}
-      <div className="relative h-44 sm:h-56" style={{ background: project.gradient }}>
+      <div className="relative h-48 sm:h-60" style={{ background: project.gradient }}>
         {project.image && (
           <img
             src={project.image}
@@ -33,6 +34,8 @@ export default function ProjectDetail({ project }: { project: Project }) {
             className="absolute inset-0 w-full h-full object-cover"
           />
         )}
+        {/* Dark overlay over image so the title and role always read on top */}
+        {project.image && <div className="absolute inset-0 bg-black/40" aria-hidden="true" />}
         <div
           className="absolute inset-0 opacity-20"
           style={{
@@ -40,13 +43,13 @@ export default function ProjectDetail({ project }: { project: Project }) {
               'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,204,0,0.06) 0%, transparent 40%)',
           }}
         />
-        {/* Title overlay at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 bg-gradient-to-t from-[#0e0c0a] via-[#0e0c0a]/80 to-transparent pt-16">
+        {/* Title overlay at bottom — heavier gradient to guarantee legibility on busy images */}
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 bg-gradient-to-t from-[#0e0c0a] via-[#0e0c0a]/95 to-transparent pt-20">
           <motion.div variants={fadeUp}>
-            <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] uppercase text-[#8a8480]/50 block mb-1.5">
+            <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-[#ffcc00]/70 block mb-2">
               {project.role}
             </span>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[#e0dcd8]">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[#e0dcd8] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
               {project.title}
             </h2>
           </motion.div>
@@ -89,8 +92,9 @@ export default function ProjectDetail({ project }: { project: Project }) {
             {project.techStack.map((tech) => (
               <span
                 key={tech.name}
-                className={`font-mono text-[9px] sm:text-[10px] tracking-[0.08em] px-2.5 py-1 border ${CATEGORY_COLORS[tech.category] ?? 'border-[#2a2420]/60 text-[#8a8480]/50'}`}
+                className={`inline-flex items-center gap-1.5 font-mono text-[9px] sm:text-[10px] tracking-[0.08em] px-2.5 py-1 border ${CATEGORY_COLORS[tech.category] ?? 'border-[#2a2420]/60 text-[#8a8480]/50'}`}
               >
+                <TechIcon name={tech.name} className="w-3 h-3 shrink-0" />
                 {tech.name}
               </span>
             ))}

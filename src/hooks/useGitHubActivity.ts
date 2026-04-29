@@ -3,30 +3,35 @@ import {
   contributionsToGrid,
   countLanguages,
   eventsToContributions,
+  findLastContribution,
   generateFallbackGrid,
 } from '../utils/github.ts'
-import type { ContributionDay, GitHubEvent, GitHubRepo } from '../utils/github.ts'
+import type {
+  ContributionDay,
+  ContributionsApiResponse,
+  GitHubEvent,
+  GitHubRepo,
+} from '../utils/github.ts'
 
-// Re-export ContributionDay so existing imports keep working
 export type { ContributionDay } from '../utils/github.ts'
 
 const GITHUB_USER = 'xdroberto'
 const API_BASE = 'https://api.github.com'
-const CACHE_KEY = 'github-activity-cache'
+const CONTRIBUTIONS_API = `https://github-contributions-api.jogruber.de/v4/${GITHUB_USER}?y=last`
+const CACHE_KEY = 'github-activity-cache-v2'
 const CACHE_TTL = 1000 * 60 * 30 // 30 minutes
-
-// ─── Types ────────────────────────────────────────────────────
+const GRID_WEEKS = 52
 
 export interface GitHubStats {
   publicRepos: number
   languages: { name: string; count: number }[]
-  totalContributions: number
-  recentCommits: number
+  contributionsLastYear: number
+  lastContributionDate: string | null
 }
 
 export interface GitHubActivityData {
   stats: GitHubStats
-  grid: number[][] // weeks × 7 days
+  grid: number[][]
   loading: boolean
   error: string | null
   isRealData: boolean
@@ -38,23 +43,19 @@ interface CachedData {
   contributions: ContributionDay[]
 }
 
-// ─── Fallback stats ──────────────────────────────────────────
-
 function getFallbackStats(): GitHubStats {
   return {
-    publicRepos: 18,
+    publicRepos: 20,
     languages: [
-      { name: 'TypeScript', count: 3 },
-      { name: 'JavaScript', count: 4 },
-      { name: 'HTML', count: 4 },
-      { name: 'SCSS', count: 1 },
+      { name: 'TypeScript', count: 4 },
+      { name: 'Python', count: 4 },
+      { name: 'JavaScript', count: 3 },
+      { name: 'HTML', count: 2 },
     ],
-    totalContributions: 0,
-    recentCommits: 0,
+    contributionsLastYear: 0,
+    lastContributionDate: null,
   }
 }
-
-// ─── API fetchers ─────────────────────────────────────────────
 
 interface GitHubUser {
   public_repos: number
@@ -72,6 +73,12 @@ async function fetchRepos(): Promise<GitHubRepo[]> {
   return res.json()
 }
 
+async function fetchContributions(): Promise<ContributionsApiResponse> {
+  const res = await fetch(CONTRIBUTIONS_API)
+  if (!res.ok) throw new Error(`Contributions fetch failed: ${res.status}`)
+  return res.json()
+}
+
 async function fetchEvents(page = 1): Promise<GitHubEvent[]> {
   const res = await fetch(
     `${API_BASE}/users/${GITHUB_USER}/events/public?per_page=100&page=${page}`,
@@ -79,8 +86,6 @@ async function fetchEvents(page = 1): Promise<GitHubEvent[]> {
   if (!res.ok) throw new Error(`Events fetch failed: ${res.status}`)
   return res.json()
 }
-
-// ─── Cache helpers ────────────────────────────────────────────
 
 function getCache(): CachedData | null {
   try {
@@ -106,10 +111,6 @@ function setCache(stats: GitHubStats, contributions: ContributionDay[]) {
   }
 }
 
-// ─── Hook ─────────────────────────────────────────────────────
-
-const GRID_WEEKS = 26
-
 export function useGitHubActivity(): GitHubActivityData {
   const [stats, setStats] = useState<GitHubStats>(getFallbackStats())
   const [grid, setGrid] = useState<number[][]>(() => generateFallbackGrid(GRID_WEEKS))
@@ -121,7 +122,6 @@ export function useGitHubActivity(): GitHubActivityData {
     let cancelled = false
 
     async function load() {
-      // Check cache first
       const cached = getCache()
       if (cached) {
         if (!cancelled) {
@@ -134,38 +134,68 @@ export function useGitHubActivity(): GitHubActivityData {
       }
 
       try {
-        // Fetch all data in parallel
-        const [profile, repos, events1, events2] = await Promise.all([
+        // Primary path: contribution calendar (mirrors the green grid on
+        // github.com/<user>, includes private contributions). Repos and
+        // profile are still fetched from GitHub directly for languages.
+        const [profile, repos, contribResp] = await Promise.all([
           fetchProfile(),
           fetchRepos(),
-          fetchEvents(1),
-          fetchEvents(2),
+          fetchContributions(),
         ])
 
         if (cancelled) return
 
-        const allEvents = [...events1, ...events2]
-        const contributions = eventsToContributions(allEvents)
-        const languages = countLanguages(repos)
-        const totalContributions = contributions.reduce((sum, c) => sum + c.count, 0)
-        const recentCommits = allEvents.filter((e) => e.type === 'PushEvent').length
+        const contributions = contribResp.contributions
+        const last = findLastContribution(contributions)
 
         const realStats: GitHubStats = {
           publicRepos: profile.public_repos,
-          languages,
-          totalContributions,
-          recentCommits,
+          languages: countLanguages(repos),
+          contributionsLastYear: contribResp.total.lastYear ?? 0,
+          lastContributionDate: last?.date ?? null,
         }
 
         setStats(realStats)
         setGrid(contributionsToGrid(contributions, GRID_WEEKS))
         setIsRealData(true)
         setCache(realStats, contributions)
-      } catch (err) {
-        if (!cancelled) {
-          const msg = err instanceof Error ? err.message : 'Unknown error'
-          setError(msg)
-          // Keep fallback data
+      } catch (primaryErr) {
+        // Fallback: derive a partial calendar from public events
+        try {
+          const [profile, repos, events1, events2] = await Promise.all([
+            fetchProfile(),
+            fetchRepos(),
+            fetchEvents(1),
+            fetchEvents(2),
+          ])
+
+          if (cancelled) return
+
+          const allEvents = [...events1, ...events2]
+          const contributions = eventsToContributions(allEvents)
+          const last = findLastContribution(contributions)
+
+          const realStats: GitHubStats = {
+            publicRepos: profile.public_repos,
+            languages: countLanguages(repos),
+            contributionsLastYear: contributions.reduce((s, c) => s + c.count, 0),
+            lastContributionDate: last?.date ?? null,
+          }
+
+          setStats(realStats)
+          setGrid(contributionsToGrid(contributions, GRID_WEEKS))
+          setIsRealData(true)
+          setCache(realStats, contributions)
+        } catch (fallbackErr) {
+          if (!cancelled) {
+            const msg =
+              fallbackErr instanceof Error
+                ? fallbackErr.message
+                : primaryErr instanceof Error
+                  ? primaryErr.message
+                  : 'Unknown error'
+            setError(msg)
+          }
         }
       } finally {
         if (!cancelled) setLoading(false)

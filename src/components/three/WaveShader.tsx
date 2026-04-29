@@ -2,6 +2,9 @@ import { useRef, useMemo, useEffect, useCallback } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
+// Global tempo. Lower = more contemplative wave motion. 1.0 = original.
+const TIME_SCALE = 0.45
+
 const vertexShader = `
 varying vec2 vUv;
 void main() {
@@ -268,7 +271,7 @@ export default function WaveShader() {
       } else {
         // Cap delta to 1/15s (~67ms) to prevent any jumps
         const delta = Math.min(clock - t.lastClock, 1 / 15)
-        t.accumulated += delta
+        t.accumulated += delta * TIME_SCALE
         t.lastClock = clock
       }
     } else {

@@ -140,4 +140,49 @@ describe('Modal', () => {
     const dialog = screen.getByRole('dialog')
     expect(dialog.getAttribute('aria-label')).toBe('Project details')
   })
+
+  it('Shift+Tab on first focusable element wraps focus to last', () => {
+    const onClose = vi.fn()
+    render(
+      <Modal isOpen={true} onClose={onClose}>
+        <button>Last Button</button>
+      </Modal>,
+    )
+    const closeBtn = screen.getByRole('button', { name: /close/i })
+    const lastBtn = screen.getByRole('button', { name: /last button/i })
+    closeBtn.focus()
+    expect(document.activeElement).toBe(closeBtn)
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true })
+    expect(document.activeElement).toBe(lastBtn)
+  })
+
+  it('Tab on last focusable element wraps focus to first', () => {
+    const onClose = vi.fn()
+    render(
+      <Modal isOpen={true} onClose={onClose}>
+        <button>Last Button</button>
+      </Modal>,
+    )
+    const closeBtn = screen.getByRole('button', { name: /close/i })
+    const lastBtn = screen.getByRole('button', { name: /last button/i })
+    lastBtn.focus()
+    expect(document.activeElement).toBe(lastBtn)
+    fireEvent.keyDown(document, { key: 'Tab' })
+    expect(document.activeElement).toBe(closeBtn)
+  })
+
+  it('Tab on a middle element does not wrap focus', () => {
+    const onClose = vi.fn()
+    render(
+      <Modal isOpen={true} onClose={onClose}>
+        <button>Middle Button</button>
+        <button>Last Button</button>
+      </Modal>,
+    )
+    const middleBtn = screen.getByRole('button', { name: /middle button/i })
+    middleBtn.focus()
+    fireEvent.keyDown(document, { key: 'Tab' })
+    // No preventDefault or focus change — middle is neither first nor last
+    expect(onClose).not.toHaveBeenCalled()
+  })
 })

@@ -1,10 +1,34 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import Section from '../components/layout/Section'
 import Modal from '../components/ui/Modal'
 import ProjectDetail from '../components/ui/ProjectDetail'
+import TechIcon from '../components/icons/TechIcon'
 import { PROJECTS } from '../data/projects'
-import type { Project } from '../data/projects'
+import type { Project, ProjectTech } from '../data/projects'
+
+const BASE_TITLE = 'Roberto BH'
+
+const TAG_CATEGORY_CLASSES: Record<ProjectTech['category'], string> = {
+  frontend: 'border-[#6366f1]/40 text-[#8b8ff5]/80 group-hover:border-[#6366f1]/60',
+  backend: 'border-[#10b981]/40 text-[#34d8a6]/80 group-hover:border-[#10b981]/60',
+  infra: 'border-[#f59e0b]/40 text-[#fbbf24]/80 group-hover:border-[#f59e0b]/60',
+  tool: 'border-[#a855f7]/40 text-[#c084fc]/80 group-hover:border-[#a855f7]/60',
+}
+
+const TAG_DEFAULT_CLASSES =
+  'border-[#2a2420]/50 text-[#8a8480]/50 group-hover:border-[#3a3430]/60 group-hover:text-[#8a8480]/70'
+
+function tagClasses(project: Project, tag: string): string {
+  const match = project.techStack.find((t) => t.name.toLowerCase() === tag.toLowerCase())
+  return match ? TAG_CATEGORY_CLASSES[match.category] : TAG_DEFAULT_CLASSES
+}
+
+function getProjectFromSearch(search: string): Project | null {
+  const id = new URLSearchParams(search).get('project')
+  if (!id) return null
+  return PROJECTS.find((p) => p.id === id) ?? null
+}
 
 function ProjectCard({
   project,
@@ -98,8 +122,12 @@ function ProjectCard({
               {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="font-mono text-[9px] tracking-[0.08em] uppercase px-2.5 py-1 border border-[#2a2420]/50 text-[#8a8480]/40 rounded-sm group-hover:border-[#3a3430]/60 group-hover:text-[#8a8480]/60 transition-colors duration-300"
+                  className={`inline-flex items-center gap-1.5 font-mono text-[9px] tracking-[0.08em] uppercase px-2.5 py-1 border rounded-sm transition-colors duration-300 ${tagClasses(
+                    project,
+                    tag,
+                  )}`}
                 >
+                  <TechIcon name={tag} className="w-3 h-3 shrink-0" />
                   {tag}
                 </span>
               ))}
@@ -112,7 +140,40 @@ function ProjectCard({
 }
 
 export default function ProjectMatrix() {
-  const [activeProject, setActiveProject] = useState<Project | null>(null)
+  const [activeProject, setActiveProject] = useState<Project | null>(() =>
+    typeof window === 'undefined' ? null : getProjectFromSearch(window.location.search),
+  )
+
+  useEffect(() => {
+    const onPop = () => setActiveProject(getProjectFromSearch(window.location.search))
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  useEffect(() => {
+    document.title = activeProject ? `${BASE_TITLE} — ${activeProject.title}` : BASE_TITLE
+    return () => {
+      document.title = BASE_TITLE
+    }
+  }, [activeProject])
+
+  const openProject = useCallback((project: Project) => {
+    setActiveProject(project)
+    const url = new URL(window.location.href)
+    url.searchParams.set('project', project.id)
+    if (url.search !== window.location.search) {
+      window.history.pushState({ project: project.id }, '', url.toString())
+    }
+  }, [])
+
+  const closeProject = useCallback(() => {
+    setActiveProject(null)
+    if (new URLSearchParams(window.location.search).has('project')) {
+      const url = new URL(window.location.href)
+      url.searchParams.delete('project')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [])
 
   return (
     <>
@@ -131,18 +192,14 @@ export default function ProjectMatrix() {
               key={project.id}
               project={project}
               index={i}
-              onOpen={() => setActiveProject(project)}
+              onOpen={() => openProject(project)}
             />
           ))}
         </div>
       </Section>
 
       {/* Project detail modal */}
-      <Modal
-        isOpen={activeProject !== null}
-        onClose={() => setActiveProject(null)}
-        title={activeProject?.title}
-      >
+      <Modal isOpen={activeProject !== null} onClose={closeProject} title={activeProject?.title}>
         {activeProject && <ProjectDetail project={activeProject} />}
       </Modal>
     </>

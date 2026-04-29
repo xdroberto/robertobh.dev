@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0604"/>
+      <stop offset="50%" stop-color="#16100c"/>
+      <stop offset="100%" stop-color="#0a0604"/>
+    </linearGradient>
+    <linearGradient id="goldFlow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffcc00" stop-opacity="0"/>
+      <stop offset="40%" stop-color="#ffcc00" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ff7a00" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#0080ff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="redFlow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0a0604" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#ff5050" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#0a0604" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="blueFlow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0a0604" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#5090ff" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#0a0604" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Wave bands evoking the Hero shader -->
+  <path d="M 0 320 Q 300 260 600 315 T 1200 320 L 1200 360 Q 900 400 600 340 T 0 360 Z" fill="url(#goldFlow)"/>
+  <path d="M 0 290 Q 350 350 700 280 T 1200 300 L 1200 320 Q 850 270 500 320 T 0 310 Z" fill="url(#redFlow)"/>
+  <path d="M 0 350 Q 280 290 550 360 T 1200 340 L 1200 380 Q 900 420 550 380 T 0 380 Z" fill="url(#blueFlow)"/>
+
+  <!-- Status pill -->
+  <g transform="translate(96 96)">
+    <rect x="0" y="0" width="280" height="38" rx="19" fill="rgba(10,6,4,0.6)" stroke="rgba(255,204,0,0.4)" stroke-width="1"/>
+    <circle cx="20" cy="19" r="4" fill="#ffcc00"/>
+    <text x="36" y="25" font-family="JetBrains Mono, monospace" font-size="12" letter-spacing="2" fill="#e0dcd8" font-weight="500">AVAILABLE FOR NEW PROJECTS</text>
+  </g>
+
+  <!-- Subtitle -->
+  <text x="96" y="240" font-family="Bodoni Moda, Georgia, serif" font-style="italic" font-size="28" fill="#e0dcd8" opacity="0.85">Software engineer · Generative artist</text>
+
+  <!-- Name -->
+  <text x="96" y="360" font-family="Inter, system-ui, sans-serif" font-size="120" font-weight="700" fill="#ffffff" letter-spacing="-3">ROBERTO BH</text>
+
+  <!-- Tagline -->
+  <text x="96" y="430" font-family="Inter, system-ui, sans-serif" font-size="24" fill="#e0dcd8" opacity="0.7">Backends, web platforms &amp; real-time visuals.</text>
+  <text x="96" y="464" font-family="Inter, system-ui, sans-serif" font-size="24" fill="#e0dcd8" opacity="0.7">TypeScript and Python, end-to-end.</text>
+
+  <!-- Footer URL -->
+  <text x="96" y="560" font-family="JetBrains Mono, monospace" font-size="14" letter-spacing="2" fill="#8a8480" opacity="0.7">ROBERTOBH.DEV</text>
+
+  <!-- Right corner monogram -->
+  <text x="1104" y="120" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="16" letter-spacing="3" fill="#e0dcd8" opacity="0.5">RBH</text>
+</svg>

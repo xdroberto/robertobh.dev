@@ -37,6 +37,57 @@ export interface Project {
 
 export const PROJECTS: Project[] = [
   {
+    id: 'legal-assistant',
+    title: 'Legal OS',
+    role: 'Full-Stack Engineer',
+    tags: ['TypeScript', 'Python', 'Postgres', 'Docker'],
+    summary:
+      'A self-hosted operating system for immigration legal practice — hybrid retrieval, schema-driven forms, hardened from auth to disk.',
+    gradient: 'linear-gradient(135deg, #1a1428 0%, #2a1f3d 50%, #3a2e52 100%)',
+    image: '/projects/legal-assistant.svg',
+    linkLabel: 'Case Study',
+    description:
+      'An operating system for an immigration legal practice. Hybrid lexical + semantic retrieval over a regulatory corpus, schema-driven form generation, and per-case workspaces with proper auth and encryption baked in — all on one self-hosted Postgres-backed stack with no managed services in the loop.',
+    techStack: [
+      { name: 'TypeScript', category: 'frontend' },
+      { name: 'React', category: 'frontend' },
+      { name: 'Node.js', category: 'backend' },
+      { name: 'Python', category: 'backend' },
+      { name: 'Postgres · pgvector', category: 'backend' },
+      { name: 'JWT · RBAC', category: 'backend' },
+      { name: 'Docker', category: 'infra' },
+      { name: 'Nginx', category: 'infra' },
+      { name: 'systemd', category: 'infra' },
+    ],
+    sections: [
+      {
+        title: 'Hybrid Retrieval',
+        content:
+          'A regulatory corpus is chunked, embedded and indexed in Postgres with pgvector for approximate-nearest-neighbour search, joined to a tsvector full-text index. Queries fan out to both pipelines and the results are reranked into a single response — every hit anchored to a real citation, never a synthesised one.',
+      },
+      {
+        title: 'Schema-Driven Forms',
+        content:
+          'Government immigration forms compile down to typed schemas validated end-to-end with Zod and Pydantic, so every field is a typed boundary between intake and PDF output. The same schema drives the UI, the API contract and the document renderer — change a field once and the whole pipeline picks it up.',
+      },
+      {
+        title: 'Case Workspaces',
+        content:
+          'Per-case workspaces hold uploads, drafts and form outputs with their own access scope. The whole stack — API, frontend, worker, Postgres — runs from a single Docker compose on a Linux VPS, deployed and rolled back through a single command, no managed services involved.',
+      },
+      {
+        title: 'Security',
+        content:
+          'AES-256 for sensitive data at rest, TLS 1.3 in transit. JWT-based session auth signed and verified at the API gateway, role-based access control gating every privileged route. Production hardening that holds up to a real review, not just a checkbox.',
+      },
+    ],
+    stats: [
+      { label: 'Retrieval', value: 'Hybrid' },
+      { label: 'Auth', value: 'JWT + RBAC' },
+      { label: 'Status', value: 'Private beta' },
+    ],
+  },
+  {
     id: 'side-effects',
     title: 'Side Effects Studio',
     role: 'Designer, Artist & Developer',
@@ -45,7 +96,7 @@ export const PROJECTS: Project[] = [
       'Creative studio exploring generative art, real-time visuals, and interactive experiences.',
     gradient: 'linear-gradient(135deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%)',
     image: '/projects/side-effects-hero.webp',
-    link: 'https://studio.robertobh.dev',
+    link: 'https://sideeffects.robertobh.dev',
     linkLabel: 'Visit Studio',
     description:
       'Side Effects is my creative studio — a space for exploring the intersection of art, code, and real-time systems. From generative visuals and shader experiments to interactive installations, the studio is where I push the boundaries of creative technology.',

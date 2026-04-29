@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import Section from '../components/layout/Section'
 import { useGitHubActivity } from '../hooks/useGitHubActivity'
+import { formatRelativeDays } from '../utils/github'
 
 const LEVEL_COLORS = [
   'bg-[#161412]', // 0 - empty
@@ -13,11 +14,14 @@ const LEVEL_COLORS = [
 export default function Activity() {
   const { stats, grid, loading, isRealData } = useGitHubActivity()
 
-  const totalCells = grid.flat().reduce((sum, v) => sum + v, 0)
+  const lastRelative = stats.lastContributionDate
+    ? formatRelativeDays(stats.lastContributionDate)
+    : null
+
+  const topLanguages = stats.languages.slice(0, 4)
 
   return (
     <Section id="activity">
-      {/* Section label */}
       <div className="mb-10 sm:mb-14">
         <div className="flex items-center gap-3">
           <span className="font-mono text-[10px] sm:text-xs tracking-[0.25em] uppercase text-[#8a8480]">
@@ -28,24 +32,34 @@ export default function Activity() {
           )}
           {isRealData && (
             <span className="font-mono text-[8px] tracking-wider uppercase text-[#6b4530]">
-              Live
+              Live · GitHub
             </span>
           )}
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-10 lg:gap-16">
-        {/* Left: description + stats */}
+        {/* Left: storytelling + stats */}
         <div>
-          <p className="text-sm sm:text-base leading-relaxed text-[#8a8480] mb-8 max-w-md">
-            {isRealData
-              ? 'Real-time contribution data pulled from GitHub. Monitoring repository commits and deployment cycles.'
-              : 'Consistent contribution to open-source infrastructure and core system logic. Monitoring repository commits and deployment cycles.'}
+          <p className="text-sm sm:text-base leading-relaxed text-[#8a8480] mb-8 max-w-xl">
+            {isRealData ? (
+              <>
+                <span className="text-[#e0dcd8]">{stats.contributionsLastYear} contributions</span>{' '}
+                in the last year across public and private repositories.
+                {lastRelative && (
+                  <>
+                    {' '}
+                    Last commit <span className="text-[#e0dcd8]">{lastRelative}</span>.
+                  </>
+                )}
+              </>
+            ) : (
+              'Activity loaded from the GitHub contribution calendar — public and private repositories combined.'
+            )}
           </p>
 
-          {/* Stats row */}
-          <div className="flex flex-wrap gap-8 sm:gap-12">
-            {/* Contributions / Activity */}
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-10 mb-8">
             <div>
               <motion.span
                 initial={{ opacity: 0 }}
@@ -53,14 +67,13 @@ export default function Activity() {
                 viewport={{ once: true }}
                 className="block font-mono text-2xl sm:text-3xl font-bold text-[#e0dcd8]"
               >
-                {isRealData ? stats.totalContributions : totalCells}
+                {stats.contributionsLastYear}
               </motion.span>
               <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#8a8480] mt-1 block">
-                {isRealData ? 'Events (90d)' : 'Contributions'}
+                Contributions / yr
               </span>
             </div>
 
-            {/* Repos */}
             <div>
               <motion.span
                 initial={{ opacity: 0 }}
@@ -71,11 +84,10 @@ export default function Activity() {
                 {stats.publicRepos}
               </motion.span>
               <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#8a8480] mt-1 block">
-                Repositories
+                Public repos
               </span>
             </div>
 
-            {/* Languages */}
             <div>
               <motion.span
                 initial={{ opacity: 0 }}
@@ -90,7 +102,6 @@ export default function Activity() {
               </span>
             </div>
 
-            {/* Top language */}
             {stats.languages.length > 0 && (
               <div>
                 <motion.span
@@ -107,38 +118,57 @@ export default function Activity() {
               </div>
             )}
           </div>
+
+          {/* Top languages breakdown */}
+          {topLanguages.length > 1 && (
+            <div className="flex flex-wrap gap-x-5 gap-y-2 max-w-md">
+              {topLanguages.map((lang) => (
+                <span
+                  key={lang.name}
+                  className="font-mono text-[10px] tracking-[0.1em] uppercase text-[#8a8480]/70"
+                >
+                  <span className="text-[#ffcc00]/70">●</span> {lang.name}
+                  <span className="text-[#8a8480]/40 ml-1.5">×{lang.count}</span>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Right: contribution grid — single animation on container, not 182 individual ones */}
+        {/* Right: contribution grid (52 weeks) */}
         <motion.div
-          className="overflow-x-auto -mx-5 px-5 sm:-mx-8 sm:px-8 lg:mx-0 lg:px-0"
+          className="w-full lg:w-[600px]"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
           aria-hidden="true"
         >
-          <div className="flex gap-[3px] w-max">
-            {grid.map((week, wi) => (
-              <div key={wi} className="flex flex-col gap-[3px]">
-                {week.map((level, di) => (
-                  <div
-                    key={`${wi}-${di}`}
-                    className={`w-[10px] h-[10px] sm:w-3 sm:h-3 rounded-[2px] ${LEVEL_COLORS[level]}`}
-                  />
-                ))}
-              </div>
-            ))}
+          <div
+            className="grid gap-[2px] sm:gap-[3px] w-full"
+            style={{ gridTemplateColumns: 'repeat(52, minmax(0, 1fr))' }}
+          >
+            {grid.map((week, wi) =>
+              week.map((level, di) => (
+                <div
+                  key={`${wi}-${di}`}
+                  className={`aspect-square rounded-[2px] ${LEVEL_COLORS[level]}`}
+                  style={{ gridColumn: wi + 1, gridRow: di + 1 }}
+                />
+              )),
+            )}
           </div>
 
-          {/* Legend */}
-          <div className="flex items-center justify-between mt-3 w-max min-w-full">
+          <div className="flex items-center justify-between mt-3 w-full">
             <span className="font-mono text-[9px] tracking-[0.1em] uppercase text-[#8a8480]/50">
-              Less
+              52w
             </span>
             <div className="flex items-center gap-[3px] mx-3">
               {LEVEL_COLORS.map((color, i) => (
-                <div key={i} className={`w-[10px] h-[10px] sm:w-3 sm:h-3 rounded-[2px] ${color}`} />
+                <div
+                  key={i}
+                  className={`w-[7px] h-[7px] sm:w-[10px] sm:h-[10px] rounded-[2px] ${color}`}
+                />
               ))}
             </div>
             <span className="font-mono text-[9px] tracking-[0.1em] uppercase text-[#8a8480]/50">
