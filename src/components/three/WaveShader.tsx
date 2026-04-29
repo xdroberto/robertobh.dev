@@ -5,6 +5,15 @@ import * as THREE from 'three'
 // Global tempo. Lower = more contemplative wave motion. 1.0 = original.
 const TIME_SCALE = 0.45
 
+// Mobile detection — runs once at module load. Used to pick a lighter quality
+// preset that drops the chromatic aberration, grain, vignette and the two
+// most expensive line/ball pairs (C and D). Roughly halves fragment cost.
+const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+
+// Cap framerate on mobile to ~30fps to give the GPU breathing room and keep
+// the frame budget below 33ms even when the OS is throttling the renderer.
+const MIN_FRAME_INTERVAL = isMobile ? 1 / 30 : 0
+
 const vertexShader = `
 varying vec2 vUv;
 void main() {
@@ -41,6 +50,12 @@ uniform float grainIntensity;
 // Chromatic aberration
 uniform float caIntensity;
 
+// Adaptive quality flags (uniforms allow GPU to fast-skip whole blocks)
+uniform float fullQuality;       // 1.0 = render lines C/D too, 0.0 = only A/B
+uniform float caEnabled;         // 1.0 = chromatic aberration on
+uniform float grainEnabled;      // 1.0 = film grain on
+uniform float vignetteEnabled;   // 1.0 = vignette on
+
 varying vec2 vUv;
 
 float smootherstep(float edge0, float edge1, float x) {
@@ -75,8 +90,6 @@ void main() {
   // Energy functions - fluid breathing cycles
   float energy1 = 0.5 + 0.5 * sin(iTime * 0.12) * sin(iTime * 0.18 + 1.2);
   float energy2 = 0.5 + 0.5 * sin(iTime * 0.10 + 2.0) * sin(iTime * 0.14);
-  float energy3 = 0.5 + 0.5 * sin(iTime * 0.14 + 4.0) * sin(iTime * 0.10 + 0.7);
-  float energy4 = 0.5 + 0.5 * sin(iTime * 0.08 + 3.0) * sin(iTime * 0.13 + 1.8);
 
   // Wide breathing cycle
   float breath = 0.5 + 0.5 * sin(iTime * 0.05);
@@ -129,80 +142,87 @@ void main() {
   float ballBShape = smootherstep(1.0 - clamp(ballBDist * ballBSize, 0.0, 1.0), 1.0, 0.99);
   vec3 ballBCol = (1.0 - ballBShape) * mix(color2In, color2Out, ballBShape) * 0.5;
 
-  // === LINE C - Orange (delicate, flowing) ===
-  float lineCWave = 0.015 + 0.035 * energy3 + breathWide * 0.6;
-  float lineCFreq = 5.0 + 10.0 * energy3;
-  float lineCSpeed = 0.18 + 0.36 * energy3;
-
-  float lineCAnim = 0.5 + mouseInfluence
-    + lineCWave * sin(lineCFreq * p.x + lineCSpeed * iTime + 0.8)
-    + 0.02 * sin(p.x * 2.5 + iTime * 0.08 - 0.5)
-    + energy3 * 0.01 * sin(p.x * 7.0 - iTime * 0.10);
-
-  float lineCThick = lineThickness * (1.0 + energy3 * 0.3);
-  float lineCDist = distance(p.y, lineCAnim) * (2.0 / lineCThick);
-  float lineCShape = smootherstep(1.0 - clamp(lineCDist, 0.0, 1.0), 1.0, 0.99);
-  vec3 lineCCol = (1.0 - lineCShape) * mix(color3In, color3Out, lineCShape);
-
-  // Ball C
-  float ballCX = 0.5 + 0.12 * sin(iTime * 0.018 + 4.0);
-  float ballCDist = distance(p, vec2(ballCX, lineCAnim));
-  float ballCSize = 0.35 + 0.25 * energy3;
-  float ballCShape = smootherstep(1.0 - clamp(ballCDist * ballCSize, 0.0, 1.0), 1.0, 0.99);
-  vec3 ballCCol = (1.0 - ballCShape) * mix(color3In, color3Out, ballCShape) * 0.5;
-
-  // === LINE D - Electric Blue (ethereal, wide sweeps) ===
-  float lineDWave = 0.02 + 0.045 * energy4 + breathWide * 0.9;
-  float lineDFreq = 3.5 + 7.0 * energy4;
-  float lineDSpeed = 0.14 + 0.28 * energy4;
-
-  float lineDAnim = 0.5 + mouseInfluence
-    + lineDWave * sin(lineDFreq * p.x - lineDSpeed * iTime + 1.5)
-    + 0.028 * sin(p.x * 1.8 + iTime * 0.06 + 2.0)
-    + energy4 * 0.014 * sin(p.x * 4.0 + iTime * 0.08);
-
-  float lineDThick = lineThickness * (1.0 + energy4 * 0.35);
-  float lineDDist = distance(p.y, lineDAnim) * (2.0 / lineDThick);
-  float lineDShape = smootherstep(1.0 - clamp(lineDDist, 0.0, 1.0), 1.0, 0.99);
-  vec3 lineDCol = (1.0 - lineDShape) * mix(color4In, color4Out, lineDShape);
-
-  // Ball D
-  float ballDX = 0.35 + 0.15 * sin(iTime * 0.013 + 1.5);
-  float ballDDist = distance(p, vec2(ballDX, lineDAnim));
-  float ballDSize = 0.35 + 0.25 * energy4;
-  float ballDShape = smootherstep(1.0 - clamp(ballDDist * ballDSize, 0.0, 1.0), 1.0, 0.99);
-  vec3 ballDCol = (1.0 - ballDShape) * mix(color4In, color4Out, ballDShape) * 0.5;
-
   // Subtle pulse flash on background
   bgCol = mix(bgCol, bgCol * 1.2, pulse * 0.3);
 
-  // Combine
-  vec3 fcolor = bgCol + lineACol + lineBCol + lineCCol + lineDCol + ballACol + ballBCol + ballCCol + ballDCol;
+  // Combine A + B
+  vec3 fcolor = bgCol + lineACol + lineBCol + ballACol + ballBCol;
 
-  // Chromatic aberration - glass/lens effect
-  // Offset increases from center for natural lens distortion
-  vec2 center = p - 0.5;
-  float dist = length(center);
-  float caAmount = caIntensity * dist * dist; // stronger toward edges
-  vec2 caDir = normalize(center + 0.001) * caAmount;
+  // === LINE C + D — only on full-quality tier (desktop) ===
+  if (fullQuality > 0.5) {
+    float energy3 = 0.5 + 0.5 * sin(iTime * 0.14 + 4.0) * sin(iTime * 0.10 + 0.7);
+    float energy4 = 0.5 + 0.5 * sin(iTime * 0.08 + 3.0) * sin(iTime * 0.13 + 1.8);
 
-  // We can't re-render the scene at offset UVs in a single pass,
-  // so we shift the RGB channels of the final color using nearby pixels
-  // approximated by the gradient of the color field
-  vec3 colorR = fcolor * (1.0 + caAmount * 2.0);
-  vec3 colorB = fcolor * (1.0 - caAmount * 1.5);
-  fcolor = vec3(
-    mix(fcolor.r, colorR.r, 0.6),
-    fcolor.g,
-    mix(fcolor.b, colorB.b, 0.6)
-  );
+    // === LINE C - Orange (delicate, flowing) ===
+    float lineCWave = 0.015 + 0.035 * energy3 + breathWide * 0.6;
+    float lineCFreq = 5.0 + 10.0 * energy3;
+    float lineCSpeed = 0.18 + 0.36 * energy3;
 
-  // Subtle vignette to enhance the glass feel
-  float vignette = 1.0 - dist * dist * 0.3;
-  fcolor *= vignette;
+    float lineCAnim = 0.5 + mouseInfluence
+      + lineCWave * sin(lineCFreq * p.x + lineCSpeed * iTime + 0.8)
+      + 0.02 * sin(p.x * 2.5 + iTime * 0.08 - 0.5)
+      + energy3 * 0.01 * sin(p.x * 7.0 - iTime * 0.10);
 
-  // Film grain (reduced)
-  fcolor = applyGrain(fcolor, p);
+    float lineCThick = lineThickness * (1.0 + energy3 * 0.3);
+    float lineCDist = distance(p.y, lineCAnim) * (2.0 / lineCThick);
+    float lineCShape = smootherstep(1.0 - clamp(lineCDist, 0.0, 1.0), 1.0, 0.99);
+    vec3 lineCCol = (1.0 - lineCShape) * mix(color3In, color3Out, lineCShape);
+
+    float ballCX = 0.5 + 0.12 * sin(iTime * 0.018 + 4.0);
+    float ballCDist = distance(p, vec2(ballCX, lineCAnim));
+    float ballCSize = 0.35 + 0.25 * energy3;
+    float ballCShape = smootherstep(1.0 - clamp(ballCDist * ballCSize, 0.0, 1.0), 1.0, 0.99);
+    vec3 ballCCol = (1.0 - ballCShape) * mix(color3In, color3Out, ballCShape) * 0.5;
+
+    // === LINE D - Electric Blue (ethereal, wide sweeps) ===
+    float lineDWave = 0.02 + 0.045 * energy4 + breathWide * 0.9;
+    float lineDFreq = 3.5 + 7.0 * energy4;
+    float lineDSpeed = 0.14 + 0.28 * energy4;
+
+    float lineDAnim = 0.5 + mouseInfluence
+      + lineDWave * sin(lineDFreq * p.x - lineDSpeed * iTime + 1.5)
+      + 0.028 * sin(p.x * 1.8 + iTime * 0.06 + 2.0)
+      + energy4 * 0.014 * sin(p.x * 4.0 + iTime * 0.08);
+
+    float lineDThick = lineThickness * (1.0 + energy4 * 0.35);
+    float lineDDist = distance(p.y, lineDAnim) * (2.0 / lineDThick);
+    float lineDShape = smootherstep(1.0 - clamp(lineDDist, 0.0, 1.0), 1.0, 0.99);
+    vec3 lineDCol = (1.0 - lineDShape) * mix(color4In, color4Out, lineDShape);
+
+    float ballDX = 0.35 + 0.15 * sin(iTime * 0.013 + 1.5);
+    float ballDDist = distance(p, vec2(ballDX, lineDAnim));
+    float ballDSize = 0.35 + 0.25 * energy4;
+    float ballDShape = smootherstep(1.0 - clamp(ballDDist * ballDSize, 0.0, 1.0), 1.0, 0.99);
+    vec3 ballDCol = (1.0 - ballDShape) * mix(color4In, color4Out, ballDShape) * 0.5;
+
+    fcolor += lineCCol + lineDCol + ballCCol + ballDCol;
+  }
+
+  // Chromatic aberration — desktop only by default
+  if (caEnabled > 0.5) {
+    vec2 center = p - 0.5;
+    float dist = length(center);
+    float caAmount = caIntensity * dist * dist;
+    vec3 colorR = fcolor * (1.0 + caAmount * 2.0);
+    vec3 colorB = fcolor * (1.0 - caAmount * 1.5);
+    fcolor = vec3(
+      mix(fcolor.r, colorR.r, 0.6),
+      fcolor.g,
+      mix(fcolor.b, colorB.b, 0.6)
+    );
+  }
+
+  // Vignette
+  if (vignetteEnabled > 0.5) {
+    vec2 vCenter = p - 0.5;
+    float vDist = length(vCenter);
+    fcolor *= 1.0 - vDist * vDist * 0.3;
+  }
+
+  // Film grain
+  if (grainEnabled > 0.5) {
+    fcolor = applyGrain(fcolor, p);
+  }
 
   gl_FragColor = vec4(fcolor, 1.0);
 }
@@ -217,8 +237,14 @@ export default function WaveShader() {
   const { gl } = useThree()
   const mouse = useRef({ x: 0.5, y: 0.5 })
 
-  // Custom time accumulator - pauses when tab is hidden, caps delta per frame
-  const timeRef = useRef({ accumulated: 0, lastClock: -1, paused: false })
+  // Custom time accumulator — pauses when tab is hidden, caps delta per frame
+  // and throttles to MIN_FRAME_INTERVAL so mobile GPUs don't melt.
+  const timeRef = useRef({
+    accumulated: 0,
+    lastClock: -1,
+    lastRender: 0,
+    paused: false,
+  })
 
   const uniforms = useMemo(
     () => ({
@@ -238,23 +264,41 @@ export default function WaveShader() {
       color3Out: { value: c(200, 100, 0) },
       color4In: { value: c(80, 160, 255) },
       color4Out: { value: c(30, 80, 200) },
+      // Adaptive quality — set once at mount, never animated
+      fullQuality: { value: isMobile ? 0 : 1 },
+      caEnabled: { value: isMobile ? 0 : 1 },
+      grainEnabled: { value: isMobile ? 0 : 1 },
+      vignetteEnabled: { value: isMobile ? 0 : 1 },
     }),
     [],
   )
 
-  // Pause/resume time when tab visibility changes
+  // Pause/resume time when tab visibility changes — also reacts to Page
+  // Lifecycle freeze events (bfcache, tab discard) to avoid time jumps.
   useEffect(() => {
     const onVisibility = () => {
       if (document.hidden) {
         timeRef.current.paused = true
       } else {
-        // Mark lastClock as stale so next frame resets delta
         timeRef.current.paused = false
         timeRef.current.lastClock = -1
       }
     }
+    const onFreeze = () => {
+      timeRef.current.paused = true
+    }
+    const onResume = () => {
+      timeRef.current.paused = false
+      timeRef.current.lastClock = -1
+    }
     document.addEventListener('visibilitychange', onVisibility)
-    return () => document.removeEventListener('visibilitychange', onVisibility)
+    document.addEventListener('freeze', onFreeze)
+    document.addEventListener('resume', onResume)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility)
+      document.removeEventListener('freeze', onFreeze)
+      document.removeEventListener('resume', onResume)
+    }
   }, [])
 
   useFrame((state) => {
@@ -264,61 +308,60 @@ export default function WaveShader() {
     const clock = state.clock.elapsedTime
     const t = timeRef.current
 
-    if (!t.paused) {
-      if (t.lastClock < 0) {
-        // First frame or returning from background - no delta
-        t.lastClock = clock
-      } else {
-        // Cap delta to 1/15s (~67ms) to prevent any jumps
-        const delta = Math.min(clock - t.lastClock, 1 / 15)
-        t.accumulated += delta * TIME_SCALE
-        t.lastClock = clock
-      }
-    } else {
-      // While paused, keep updating lastClock to prevent delta buildup
+    if (t.paused) {
       t.lastClock = clock
+      return
     }
+
+    if (t.lastClock < 0) {
+      t.lastClock = clock
+      t.lastRender = clock
+    }
+
+    // Frame budget cap (mobile only) — skip render if not enough time elapsed
+    if (MIN_FRAME_INTERVAL > 0 && clock - t.lastRender < MIN_FRAME_INTERVAL) {
+      // Don't update lastClock — we want next frame's delta to include skipped time
+      return
+    }
+    t.lastRender = clock
+
+    // Cap delta to 1/15s (~67ms) to prevent any jumps after long pauses
+    const delta = Math.min(clock - t.lastClock, 1 / 15)
+    t.accumulated += delta * TIME_SCALE
+    t.lastClock = clock
 
     material.uniforms.iTime.value = t.accumulated
     material.uniforms.iResolution.value.set(state.size.width, state.size.height)
     material.uniforms.iMouse.value.set(mouse.current.x, mouse.current.y)
   })
 
-  // Mouse tracking (desktop)
+  // Mouse tracking (desktop only — mobile mouseInfluence stays at 0)
   const onMove = useCallback((e: MouseEvent) => {
     mouse.current.x = e.clientX / window.innerWidth
     mouse.current.y = e.clientY / window.innerHeight
   }, [])
 
-  // Touch tracking (mobile)
-  const onTouch = useCallback((e: TouchEvent) => {
-    if (e.touches.length > 0) {
-      mouse.current.x = e.touches[0].clientX / window.innerWidth
-      mouse.current.y = e.touches[0].clientY / window.innerHeight
-    }
-  }, [])
-
   useEffect(() => {
+    if (isMobile) return
     window.addEventListener('mousemove', onMove)
-    window.addEventListener('touchmove', onTouch, { passive: true })
     return () => {
       window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('touchmove', onTouch)
     }
-  }, [onMove, onTouch])
+  }, [onMove])
 
-  // Handle WebGL context loss gracefully
+  // Handle WebGL context loss gracefully — prevent default so the browser
+  // tries to restore, and emit a warning so we can spot it in the field.
   useEffect(() => {
     const canvas = gl.domElement
     const onLost = (e: Event) => {
       e.preventDefault()
-      // Pause time so animation doesn't jump when context restores
       timeRef.current.paused = true
+      console.warn('[WaveShader] WebGL context lost — waiting for restore')
     }
     const onRestored = () => {
-      // Reset time tracking and resume - R3F handles recompilation
       timeRef.current.paused = false
       timeRef.current.lastClock = -1
+      console.warn('[WaveShader] WebGL context restored')
     }
     canvas.addEventListener('webglcontextlost', onLost)
     canvas.addEventListener('webglcontextrestored', onRestored)

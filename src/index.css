@@ -31,19 +31,29 @@ body,
   letter-spacing: -0.03em;
 }
 
-/* Noise overlay - hero only */
+/* Noise overlay - hero only.
+ * Self-hosted, scoped tighter (110% instead of 200%), and disabled on mobile
+ * where the animated transform causes severe repaint cost on top of the WebGL
+ * canvas (main culprit for hero flicker on phones).
+ */
 .noise-overlay {
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: transparent url('https://assets.iceable.com/img/noise-transparent.png') repeat 0 0;
-  background-size: 300px 300px;
+  top: -5%;
+  left: -5%;
+  width: 110%;
+  height: 110%;
+  background: transparent url('/noise.png') repeat 0 0;
+  background-size: 240px 240px;
   animation: noise-animation 0.3s steps(5) infinite;
-  opacity: 0.5;
+  opacity: 0.4;
   will-change: transform;
   pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .noise-overlay {
+    display: none;
+  }
 }
 
 @keyframes noise-animation {

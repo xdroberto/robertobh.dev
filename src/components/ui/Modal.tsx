@@ -122,10 +122,13 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
             aria-label={title ?? 'Project details'}
           >
             <div className="relative bg-[#0e0c0a] border border-[#2a2420] overflow-hidden">
-              {/* Close button */}
+              {/* Close button — circular dark backdrop so it's legible on top
+                  of any project header image (e.g. the bright Moonhouse hero).
+                  44×44 tap target, fixed-position so scroll inside the modal
+                  never hides it. */}
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 z-10 p-3 -m-1 text-[#8a8480]/40 hover:text-[#e0dcd8] transition-colors duration-200"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 inline-flex items-center justify-center w-11 h-11 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 text-white/90 hover:bg-black/80 hover:text-white hover:border-white/30 active:scale-95 transition-all duration-200 shadow-lg shadow-black/40"
                 aria-label="Close"
               >
                 <svg
@@ -133,7 +136,7 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
-                  strokeWidth={1.5}
+                  strokeWidth={2}
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
