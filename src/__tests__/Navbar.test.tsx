@@ -94,4 +94,27 @@ describe('Navbar', () => {
     fireEvent.click(logoLink)
     expect(window.scrollTo).toHaveBeenCalled()
   })
+
+  it('applies scrolled-state classes when scrollY > 60', () => {
+    const { container } = render(<Navbar />)
+    Object.defineProperty(window, 'scrollY', { value: 100, configurable: true })
+    fireEvent.scroll(window)
+    const nav = container.querySelector('nav') as HTMLElement
+    expect(nav).toBeTruthy()
+    // Mobile: fully opaque (no compositing). sm:+: translucent + blur.
+    expect(nav.className).toContain('bg-[#0a0604]')
+    expect(nav.className).toContain('sm:backdrop-blur-xl')
+    // Reset for other tests
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true })
+  })
+
+  it('uses the bg-transparent class (no scrolled style) when scrollY is 0', () => {
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true })
+    const { container } = render(<Navbar />)
+    fireEvent.scroll(window)
+    const nav = container.querySelector('nav') as HTMLElement
+    expect(nav).toBeTruthy()
+    expect(nav.className).toContain('bg-transparent')
+    expect(nav.className).not.toContain('sm:backdrop-blur-xl')
+  })
 })

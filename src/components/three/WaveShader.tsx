@@ -1,6 +1,6 @@
 import { useRef, useMemo, useEffect, useCallback } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Vector2, Vector3, type Mesh, type ShaderMaterial } from 'three'
 
 // Global tempo. Lower = more contemplative wave motion. 1.0 = original.
 const TIME_SCALE = 0.45
@@ -229,11 +229,11 @@ void main() {
 `
 
 function c(r: number, g: number, b: number) {
-  return new THREE.Vector3(r / 255, g / 255, b / 255)
+  return new Vector3(r / 255, g / 255, b / 255)
 }
 
 export default function WaveShader() {
-  const meshRef = useRef<THREE.Mesh>(null)
+  const meshRef = useRef<Mesh>(null)
   const { gl } = useThree()
   const mouse = useRef({ x: 0.5, y: 0.5 })
 
@@ -248,9 +248,9 @@ export default function WaveShader() {
 
   const uniforms = useMemo(
     () => ({
-      iResolution: { value: new THREE.Vector2(1, 1) },
+      iResolution: { value: new Vector2(1, 1) },
       iTime: { value: 0 },
-      iMouse: { value: new THREE.Vector2(0.5, 0.5) },
+      iMouse: { value: new Vector2(0.5, 0.5) },
       lineThickness: { value: 1.8 },
       grainIntensity: { value: 0.03 },
       caIntensity: { value: 0.15 },
@@ -264,11 +264,14 @@ export default function WaveShader() {
       color3Out: { value: c(200, 100, 0) },
       color4In: { value: c(80, 160, 255) },
       color4Out: { value: c(30, 80, 200) },
-      // Adaptive quality — set once at mount, never animated
-      fullQuality: { value: isMobile ? 0 : 1 },
-      caEnabled: { value: isMobile ? 0 : 1 },
-      grainEnabled: { value: isMobile ? 0 : 1 },
-      vignetteEnabled: { value: isMobile ? 0 : 1 },
+      // Quality flags kept as uniforms for future tiering, but we now render
+      // the full visual on every device — earlier mobile profiling showed the
+      // flicker did NOT come from shader cost, so simplifying it just made
+      // the hero look weaker without any FPS gain.
+      fullQuality: { value: 1 },
+      caEnabled: { value: 1 },
+      grainEnabled: { value: 1 },
+      vignetteEnabled: { value: 1 },
     }),
     [],
   )
@@ -302,7 +305,7 @@ export default function WaveShader() {
   }, [])
 
   useFrame((state) => {
-    const material = meshRef.current?.material as THREE.ShaderMaterial
+    const material = meshRef.current?.material as ShaderMaterial
     if (!material) return
 
     const clock = state.clock.elapsedTime

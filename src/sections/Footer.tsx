@@ -1,5 +1,3 @@
-import { motion } from 'framer-motion'
-
 const LINKS = [
   { label: 'GitHub', href: 'https://github.com/xdroberto' },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/roberto-becerril-hurtado/' },
@@ -13,52 +11,55 @@ export default function Footer() {
         {/* Main: CTA left, links right */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8 sm:gap-10 mb-10 sm:mb-12">
           <div className="max-w-sm">
-            <motion.h3
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="font-display text-xl sm:text-2xl font-semibold text-[#e0dcd8] mb-3"
-            >
+            <h2 className="font-display text-xl sm:text-2xl font-semibold text-[#e0dcd8] mb-3">
               Let's build something.
-            </motion.h3>
+            </h2>
             <p className="text-xs sm:text-sm text-[#8a8480] leading-relaxed">
               Open to collaboration and interesting conversations about technology.
             </p>
           </div>
 
           <nav className="flex flex-row flex-wrap sm:flex-col items-start gap-x-6 gap-y-2 sm:gap-3 sm:items-end">
-            {LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.href.startsWith('mailto') ? undefined : '_blank'}
-                rel={link.href.startsWith('mailto') ? undefined : 'noopener noreferrer'}
-                className="font-mono text-[11px] sm:text-xs tracking-[0.15em] uppercase text-[#8a8480]/70 hover:text-[#ffcc00] transition-colors duration-300"
-              >
-                {link.label}
-              </a>
-            ))}
+            {LINKS.map((link) => {
+              const isExternal = !link.href.startsWith('mailto')
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target={isExternal ? '_blank' : undefined}
+                  rel={isExternal ? 'noopener noreferrer' : undefined}
+                  className="font-mono text-[11px] sm:text-xs tracking-[0.15em] uppercase text-[#8a8480] hover:text-[#ffcc00] transition-colors duration-300"
+                >
+                  {link.label}
+                  {isExternal && <span className="sr-only"> (opens in new tab)</span>}
+                </a>
+              )
+            })}
           </nav>
         </div>
 
         {/* Bottom bar */}
         <div className="h-px bg-[#2a2420]/30 mb-5" />
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 font-mono text-[9px] sm:text-[10px] tracking-[0.12em] text-[#8a8480]/40">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 font-mono text-[9px] sm:text-[10px] tracking-[0.12em] text-[#8a8480]/70">
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
             <span>&copy; {new Date().getFullYear()} Roberto BH</span>
             <span aria-hidden="true">&middot;</span>
             <span className="flex items-center gap-1.5">
               Made in
-              <svg
-                className="w-4 h-[10px] shrink-0"
-                viewBox="0 0 60 36"
-                aria-label="Mexico"
+              {/* The Mexican flag without the coat of arms is visually identical
+                  to the Italian flag — both are vertical green-white-red. The
+                  emoji renders the OS-native flag glyph (with the eagle on
+                  iOS/Android/macOS), which is unambiguous and accessible. */}
+              <span
                 role="img"
+                aria-label="Mexico"
+                className="leading-none shrink-0 text-sm"
+                style={{
+                  fontFamily: '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif',
+                }}
               >
-                <rect width="20" height="36" fill="#006847" />
-                <rect x="20" width="20" height="36" fill="#fff" />
-                <rect x="40" width="20" height="36" fill="#ce1126" />
-              </svg>
+                🇲🇽
+              </span>
             </span>
           </div>
           <a
@@ -79,11 +80,12 @@ export default function Footer() {
               <rect y="24" width="60" height="12" fill="#009736" />
               <polygon points="0,0 20,18 0,36" fill="#ce1126" />
             </svg>
-            <span className="text-[#8a8480]/40 group-hover:text-[#8a8480]/60 transition-colors">
+            <span className="text-[#8a8480]/70 group-hover:text-[#8a8480] transition-colors">
               Donate for Palestine
             </span>
+            <span className="sr-only">(opens in new tab)</span>
             <svg
-              className="w-2.5 h-2.5 text-[#ce1126]/40 shrink-0"
+              className="w-2.5 h-2.5 text-[#ce1126]/70 shrink-0"
               viewBox="0 0 24 24"
               fill="currentColor"
               aria-hidden="true"

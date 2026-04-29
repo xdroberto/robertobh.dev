@@ -44,7 +44,7 @@ export const PROJECTS: Project[] = [
     summary:
       'A self-hosted operating system for immigration legal practice — hybrid retrieval, schema-driven forms, hardened from auth to disk.',
     gradient: 'linear-gradient(135deg, #1a1428 0%, #2a1f3d 50%, #3a2e52 100%)',
-    image: '/projects/legal-assistant.svg',
+    image: '/projects/legal-assistant.webp',
     linkLabel: 'Case Study',
     description:
       'An operating system for an immigration legal practice. Hybrid lexical + semantic retrieval over a regulatory corpus, schema-driven form generation, and per-case workspaces with proper auth and encryption baked in — all on one self-hosted Postgres-backed stack with no managed services in the loop.',

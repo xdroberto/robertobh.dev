@@ -19,16 +19,60 @@
 html {
   scroll-behavior: smooth;
   background-color: var(--color-surface);
+  /* Stop iOS Safari's rubberband over-scroll past the document end —
+   * the user perceived the bouncy empty space at the bottom as "scroll
+   * is much longer than the content." */
+  overscroll-behavior-y: none;
+  /* Disable iOS Safari's gray tap-highlight overlay. When a user taps a
+   * tappable element (cards, links), iOS shows a translucent gray flash.
+   * As scroll-touches drift across multiple cards, this can manifest as
+   * "flickering cards." */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* All interactive elements: instant click on touch (kills the iOS 300ms
+ * delay) and no native context-menu callout when long-pressing. */
+button,
+a,
+[role='button'] {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
 }
 
 body,
 #root {
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
   background-color: var(--color-surface);
   color: var(--color-text);
   letter-spacing: -0.03em;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Touch devices: kill sticky-hover flicker on cards.
+ *
+ * iOS Safari and Android Chrome activate :hover when you tap a hoverable
+ * element, and the hover state lingers until the next tap elsewhere. As
+ * scroll-touches drift across cards, the hover toggles on/off repeatedly,
+ * triggering Tailwind's `group-hover:translate`, `group-hover:scale`, and
+ * `group-hover:opacity` transitions and producing the visible flicker the
+ * user reports.
+ *
+ * We disable transforms inside hovered `.group`s on devices without a
+ * fine pointer. This affects descendants only — Framer Motion's transforms
+ * (set on the `.group` element itself) are untouched, so entrance
+ * animations still work.
+ */
+@media (hover: none) {
+  .group:hover *,
+  .group:focus *,
+  .group:active * {
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 /* Noise overlay - hero only.
@@ -46,8 +90,13 @@ body,
   background-size: 240px 240px;
   animation: noise-animation 0.3s steps(5) infinite;
   opacity: 0.4;
-  will-change: transform;
   pointer-events: none;
+}
+
+@media (min-width: 769px) {
+  .noise-overlay {
+    will-change: transform;
+  }
 }
 
 @media (max-width: 768px) {

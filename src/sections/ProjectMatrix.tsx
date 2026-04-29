@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
 import Section from '../components/layout/Section'
 import Modal from '../components/ui/Modal'
 import ProjectDetail from '../components/ui/ProjectDetail'
@@ -40,23 +39,17 @@ function ProjectCard({
   onOpen: () => void
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group h-full"
-    >
+    <div className="group h-full">
       <button
         onClick={onOpen}
-        className="w-full h-full text-left cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#ffcc00]/40"
+        className="w-full h-full text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffcc00]/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0604]"
       >
-        <div className="h-full border border-[#2a2420]/70 bg-[#0e0c0a] rounded-sm overflow-hidden transition-all duration-500 ease-out group-hover:border-[#4a3e36] group-hover:shadow-[0_4px_30px_rgba(255,204,0,0.04)] group-hover:-translate-y-1 flex flex-col">
+        <div className="h-full border border-[#2a2420]/70 bg-[#0e0c0a] rounded-sm overflow-hidden transition-colors duration-300 ease-out group-hover:border-[#4a3e36] group-hover:shadow-[0_4px_30px_rgba(255,204,0,0.04)] group-hover:-translate-y-1 flex flex-col">
           {/* Card body */}
           <div className="p-6 sm:p-7 flex flex-col flex-1">
             {/* Header row: number + open indicator */}
             <div className="flex items-center justify-between mb-5">
-              <span className="font-mono text-[10px] tracking-[0.2em] text-[#8a8480]/25">
+              <span className="font-mono text-[10px] tracking-[0.2em] text-[#8a8480]/70">
                 {String(index + 1).padStart(2, '0')}
               </span>
               <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -84,13 +77,13 @@ function ProjectCard({
               <h3 className="font-display text-lg sm:text-xl font-semibold tracking-tight text-[#e0dcd8] group-hover:text-white transition-colors duration-300">
                 {project.title}
               </h3>
-              <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.12em] uppercase text-[#8a8480]/40">
+              <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.12em] uppercase text-[#8a8480]/70">
                 {project.role}
               </span>
             </div>
 
             {/* Summary */}
-            <p className="text-sm leading-relaxed text-[#8a8480]/70 mb-5">{project.summary}</p>
+            <p className="text-sm leading-relaxed text-[#8a8480] mb-5">{project.summary}</p>
 
             {/* Image preview — contained, elegant thumbnail */}
             {project.image && (
@@ -135,7 +128,7 @@ function ProjectCard({
           </div>
         </div>
       </button>
-    </motion.div>
+    </div>
   )
 }
 

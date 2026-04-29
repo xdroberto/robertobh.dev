@@ -252,4 +252,63 @@ describe('useGitHubActivity', () => {
       }
     }
   })
+
+  it('does not log act() warnings when fetch resolves after unmount', async () => {
+    // Start a fetch that we control: it never resolves until we say so.
+    let resolveProfile!: (v: unknown) => void
+    let resolveRepos!: (v: unknown) => void
+    let resolveContrib!: (v: unknown) => void
+    const profilePromise = new Promise((r) => {
+      resolveProfile = r
+    })
+    const reposPromise = new Promise((r) => {
+      resolveRepos = r
+    })
+    const contribPromise = new Promise((r) => {
+      resolveContrib = r
+    })
+
+    vi.spyOn(globalThis, 'fetch').mockImplementation((url: string | URL | Request) => {
+      const u = url.toString()
+      const make = (p: Promise<unknown>) =>
+        p.then(
+          (data) =>
+            ({
+              ok: true,
+              status: 200,
+              json: () => Promise.resolve(data),
+            }) as unknown as Response,
+        )
+      if (u.includes('github-contributions-api')) return make(contribPromise)
+      if (u.includes('/repos')) return make(reposPromise)
+      return make(profilePromise)
+    })
+
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const { unmount } = renderHook(() => useGitHubActivity())
+
+    // Unmount before any fetch resolves; the cleanup sets cancelled=true
+    unmount()
+
+    // Now resolve all in-flight fetches — the hook should ignore the
+    // results because cancelled is true, so React should not log any
+    // act() / state-update-on-unmounted warnings.
+    resolveProfile({ public_repos: 7 })
+    resolveRepos([{ language: 'TS' }])
+    resolveContrib({
+      total: { lastYear: 1 },
+      contributions: [{ date: '2026-04-22', count: 1, level: 1 }],
+    })
+
+    // Yield enough turns for the await chain to fully unwind.
+    await new Promise((r) => setTimeout(r, 30))
+    await new Promise((r) => setTimeout(r, 0))
+
+    const actWarning = consoleErrorSpy.mock.calls.find((call) =>
+      call.some((a) => typeof a === 'string' && /act\(|not wrapped in act/i.test(a)),
+    )
+    expect(actWarning).toBeUndefined()
+    consoleErrorSpy.mockRestore()
+  })
 })

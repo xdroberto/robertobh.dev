@@ -51,6 +51,7 @@ vi.mock('framer-motion', () => ({
     },
   ),
   AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
+  useReducedMotion: () => false,
 }))
 
 import ProjectMatrix from '../sections/ProjectMatrix'
